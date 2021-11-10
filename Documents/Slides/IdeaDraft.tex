@@ -1,0 +1,116 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage[utf8]{luainputenc}
+\usepackage{amssymb,amsmath}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{beamercolorthemetud}
+\usepackage[backend=biber]{biblatex}
+\usepackage{caption}
+\captionsetup[figure]{font=scriptsize}
+
+\usepackage{subcaption}
+\usepackage[absolute,overlay]{textpos}
+  \setlength{\TPHorizModule}{1mm}
+  \setlength{\TPVertModule}{1mm}
+
+
+
+
+\addbibresource{bibl.bib}
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\usepackage[english]{babel}
+\usetheme[]{tud}
+\setbeamercolor{background canvas}{bg=}
+\setbeamerfont{frametitle}{size=\Large}
+\input{macros}
+
+
+
+\title{App Idea Presentation: MeetForSport}
+\author{Mattis ..., Felix Fischer}
+\date{12.11.2021}
+
+\einrichtung{\hspace{-1pt}Institute of Systems Architecture}
+\datecity{Dresden}
+
+
+
+
+\AtBeginSection[]{\partpage{\usebeamertemplate***{part page}}}
+\begin{document}
+\maketitle
+
+
+
+\begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents
+\end{frame}
+
+
+
+
+
+\section{Scenario}
+\begin{frame}   
+\frametitle{Our Scenario}
+Imagine:
+         \begin{itemize}	
+	 \item You are an active person
+	 \item You'd like to start a new sport and need people to teach you OR
+	 \item You're missing teammates to play with or need motivation
+    \end{itemize}
+\end{frame}
+
+
+\section{Problem}
+\begin{frame}   
+While there are many (fitness) Apps out on the market, none really addresses the problem of lacking people to play with.
+Joining an active community is still part of ones social circle, whereas every other aspect of our live can be enhanced by multimedia devices.
+\end{frame}
+
+
+\section{Our Solution}
+\begin{frame}   
+\frametitle{What is our idea?}
+Our Solution is rather simple and draws its inspiration from other networking apps.
+Our App would try to solve these problems. It is supposed to become an App that
+         \begin{itemize}	
+	 \item enables you to find people interested in the same sport
+	 \item suggests places for your activity 
+	 \item sets up meeting times and points
+	 \item builds a community around your activities 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}   
+\frametitle{Target Group}
+The App will target persons of nearly all ages who are interested in physical group activities
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Key Features}
+For the time being, we think about building an Android App based on the Server-Client Model.
+
+By using a:
+\begin{itemize}
+	\item either predefined set of sport fields and parks or api,
+	\item database containing sports 
+	\item customizable and adaptable user profiles 
+\end{itemize}
+ the App will help to find people nearby who have the same interests.
+\end{frame}
+
+\section{Challenges}
+\begin{frame}
+	\begin{itemize}
+		\item build/find an efficient way to find locations
+		\item assign each sport a set of requirements (e.g. important features the location needs)
+		\item build a user database
+		\item build an organizer 
+		\item implement interaction possibilities
+	\end{itemize}
+\end{frame}
+
+\end{document}
