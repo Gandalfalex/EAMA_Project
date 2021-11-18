@@ -1,0 +1,12 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {english}{}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {1}{Scenario}{3}{0}{1}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {2}{Our Idea}{5}{0}{2}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {3}{Key Features}{12}{0}{3}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {4}{Challenges}{17}{0}{4}
+\defcounter {refsection}{0}\relax 
+\beamer@sectionintoc {5}{Architecture and key technologies}{19}{0}{5}
