@@ -3,6 +3,11 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="Map">Map</string>
+    <string name="Event">Event</string>
+    <string name="Person">User Profile</string>
+
     <string name="new_Event">new Event</string>
     <string name="user_Name"> Hans Dieter</string>
     <string name="page"> My Page</string>
