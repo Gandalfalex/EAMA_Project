@@ -3,12 +3,32 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="cancel">cancel</string>
+    <string name="submit">submit</string>
 
+    <!-- Menu Strings -->
     <string name="Map">Map</string>
     <string name="Event">Event</string>
     <string name="Person">User Profile</string>
 
+
+    <string name="user_Name">Hans Dieter</string>
+    <string name="page">My Page</string>
+
+    <!-- Create new Event Strings -->
     <string name="new_Event">new Event</string>
-    <string name="user_Name"> Hans Dieter</string>
-    <string name="page"> My Page</string>
+    <string name="new_Event_planner_headline">plan your new event</string>
+
+    <string name="find_location">find location</string>
+    <string name="address">this will be your address</string>
+    <string name="location">Location</string>
+    <string name="sport">Sport</string>
+    <string name="find_sport">find sport</string>
+
+
+    <!-- Sport information -->
+    <string name="sport_name">Sport name</string>
+    <string name="participants_number"> 13 people</string>
+
+
 </resources>
