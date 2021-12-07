@@ -23,12 +23,15 @@
     <string name="address">this will be your address</string>
     <string name="location">Location</string>
     <string name="sport">Sport</string>
+    <string name="description">Description</string>
     <string name="find_sport">find sport</string>
 
 
     <!-- Sport information -->
     <string name="sport_name">Sport name</string>
     <string name="participants_number"> 13 people</string>
+    <string name="time">time</string>
+    <string name="date">date</string>
 
 
 </resources>

@@ -13,6 +13,7 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meetforsport.R;
 import com.example.meetforsport.ui.EventCreator.TimeDatePicker.DatePicker;
@@ -21,10 +22,10 @@ import com.example.meetforsport.ui.EventCreator.TimeDatePicker.TimePicker;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventCreator extends AppCompatActivity implements View.OnClickListener {
+public class EventCreator extends AppCompatActivity{
 
-    private final int MAP_MODE = 1;
-    private final int SPORT_MODE = 2;
+    private final static int MAP_MODE = 2;
+    private final static int SPORT_MODE = 1;
 
 
     public static Dialog dialog;
@@ -41,9 +42,15 @@ public class EventCreator extends AppCompatActivity implements View.OnClickListe
         address = findViewById(R.id.address);
         sport = findViewById(R.id.sport_selection);
 
-        findViewById(R.id.find_sport_btn).setOnClickListener(this);
-        findViewById(R.id.find_location_btn).setOnClickListener(this);
-        findViewById(R.id.submit_value).setOnClickListener(this);
+        findViewById(R.id.find_sport_btn).setOnClickListener(view -> {
+            showDialog(EventCreator.this, SPORT_MODE);
+        });
+        findViewById(R.id.find_location_btn).setOnClickListener(view -> {
+            showDialog(EventCreator.this, MAP_MODE);
+        });
+        findViewById(R.id.submit_value).setOnClickListener(view -> {
+            checkInput();
+        });
 
         EditText date = findViewById(R.id.event_date_text);
         date.setShowSoftInputOnFocus(false);
@@ -54,6 +61,48 @@ public class EventCreator extends AppCompatActivity implements View.OnClickListe
         new TimePicker(time, "HH:mm");
     }
 
+
+    /***
+     * Check User Input, if anything is missing, return false and create a Toast message containing all information that are missing
+     * if not,  TODO send information to SERVER CLASS
+     *          TODO create a local save of the event
+     * @return
+     */
+    private boolean checkInput() {
+        EditText date_edit_text = (EditText) findViewById(R.id.event_date_text);
+        EditText description_edit_text = (EditText) findViewById(R.id.event_description);
+        EditText time_edit_text = (EditText) findViewById(R.id.event_time_text);
+
+        String sport_information    = (sport.getText().toString().equals(getResources().getString(R.string.sport))) ? "" : sport.getText().toString();  //later use the saved information of the get request
+        String map_information      = (address.getText().toString().equals(getResources().getString(R.string.address))) ? "" : address.getText().toString();    //later use the saved information of the get request
+        String description = (description_edit_text.getText().toString().equals(getResources().getString(R.string.sport))) ? "" : sport.getText().toString();
+        String time = time_edit_text.getText().toString();
+        String date = date_edit_text.getText().toString();
+
+
+        String errorWarning = "";
+        if (sport_information.equals(""))   {errorWarning = errorMessageBuilder(errorWarning, "no sport selected");}
+        if (map_information.equals(""))     {errorWarning = errorMessageBuilder(errorWarning, "no location selected"); }
+        if (description.equals(""))         {errorWarning = errorMessageBuilder(errorWarning, "no description added");}
+        if (time.equals(""))                {errorWarning = errorMessageBuilder(errorWarning, "please select a time");}
+        if (date.equals(""))                {errorWarning = errorMessageBuilder(errorWarning, "please select a date");}
+
+        if (errorWarning.equals("")) return true;
+        Toast warning = Toast.makeText(getApplicationContext(), errorWarning, Toast.LENGTH_LONG);
+        warning.show();
+        return false;
+    }
+
+    /***
+     * concatinate Strings to create a "understandable" error message
+     * @param existingErrorMsg
+     * @param errorMessage
+     * @return  s1 + s2
+     */
+    private String errorMessageBuilder(String existingErrorMsg, String errorMessage){
+        if (existingErrorMsg.equals("")) return errorMessage;
+        return existingErrorMsg + " and " + errorMessage;
+    }
 
 
     @Override
@@ -72,6 +121,12 @@ public class EventCreator extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    /***
+     * Create one of two dialogs asking the user to select either a location or a sport. These dialogs open the same dialog, but fill the recyclerview differently
+     * TODO fetch the displayed data from a server via GET Request
+     * @param activity
+     * @param version
+     */
     public void showDialog(Activity activity, int version){
         dialog = new Dialog(activity);
         dialog.setCancelable(false);
@@ -83,8 +138,8 @@ public class EventCreator extends AppCompatActivity implements View.OnClickListe
 
         RecyclerView recyclerView = dialog.findViewById(R.id.recycler_view);
         RecyclerviewAdapter adapterRe;
-        if (version == 1)   adapterRe = new RecyclerviewAdapter(EventCreator.this, DummyInformation(), "sportInformation");
-        else                adapterRe = new RecyclerviewAdapter(EventCreator.this, FakeMaps(), "mapInformation");
+        if (version == 1)   adapterRe = new RecyclerviewAdapter(EventCreator.this, DummyInformation(), SPORT_MODE);
+        else                adapterRe = new RecyclerviewAdapter(EventCreator.this, FakeMaps(), MAP_MODE);
 
         recyclerView.setAdapter(adapterRe);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
@@ -93,33 +148,21 @@ public class EventCreator extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-    public static void fillEvent(String context, int position){
-        if (context.equals("mapInformation")){
+    /***
+     * Display the user's selection
+     * @param USAGE_TYPE
+     * @param position
+     */
+    public static void applyChanges(final int USAGE_TYPE, int position){
+        if (USAGE_TYPE == MAP_MODE){
             map_position = position;
             address.setText(FakeMaps().get(position).first);
         }
-        else{
+        else if (USAGE_TYPE == SPORT_MODE){
            sport_position = position;
            sport.setText(DummyInformation().get(position).first);
         }
     }
-
-
-
-
-    @Override
-    //TODO add test for submit routine
-    public void onClick(View view) {
-        switch (view.getId()){
-            case (R.id.submit_value):       {}
-            case (R.id.find_location_btn):  {showDialog(EventCreator.this, MAP_MODE);}
-            case (R.id.find_sport_btn):     {showDialog(EventCreator.this, SPORT_MODE);}
-            break;
-        }
-    }
-
-
 
 
 

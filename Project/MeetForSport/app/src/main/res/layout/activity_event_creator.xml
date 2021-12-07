@@ -49,13 +49,12 @@
     <ImageView
         android:id="@+id/gps_view"
         android:layout_width="46dp"
-        android:layout_height="46dp"
+        android:layout_height="wrap_content"
         android:layout_alignTop="@+id/find_location_btn"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="1dp"
+        android:layout_alignBottom="@+id/find_location_btn"
         android:layout_marginEnd="152dp"
         android:layout_toStartOf="@+id/find_location_btn"
-        tools:srcCompat="@drawable/ic_baseline_gps_fixed" />
+        android:src="@drawable/ic_baseline_gps_fixed" />
 
 
     <TextView
@@ -86,13 +85,12 @@
     <ImageView
         android:id="@+id/sport_view"
         android:layout_width="46dp"
-        android:layout_height="46dp"
+        android:layout_height="wrap_content"
         android:layout_alignTop="@+id/find_sport_btn"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="1dp"
+        android:layout_alignBottom="@+id/find_sport_btn"
         android:layout_marginEnd="152dp"
         android:layout_toStartOf="@+id/find_sport_btn"
-        tools:srcCompat="@drawable/ic_baseline_sport" />
+        android:src="@drawable/ic_baseline_sport" />
 
     <TextView
         android:id="@+id/sport_textview_headline"
@@ -125,8 +123,8 @@
         android:layout_alignLeft="@+id/find_location_btn"
         android:layout_alignEnd="@+id/find_location_btn"
         android:layout_alignRight="@+id/find_location_btn"
-        android:text="@string/find_sport"
         android:layout_marginTop="20dp"
+        android:text="@string/find_sport"
         app:layout_constraintStart_toEndOf="@+id/sport_view" />
 
 
@@ -158,6 +156,7 @@
         android:layout_marginEnd="10dp"
         android:layout_toEndOf="@+id/event_time_text"
         android:ems="10"
+        android:hint="@string/date"
         android:inputType="date" />
 
     <EditText
@@ -168,6 +167,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="50dp"
         android:ems="10"
+        android:hint="@string/time"
         android:inputType="time" />
 
     <EditText
@@ -178,6 +178,7 @@
         android:layout_marginTop="133dp"
         android:ems="10"
         android:gravity="start|top"
+        android:hint="@string/description"
         android:inputType="textMultiLine" />
 
     <Button

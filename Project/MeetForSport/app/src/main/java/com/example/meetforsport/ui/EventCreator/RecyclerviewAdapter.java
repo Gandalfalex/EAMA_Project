@@ -20,14 +20,14 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
     private List<Pair<String,String>> information;
     private Context context;
-    private String informationType;
+    private final int USAGE_TYPE;
 
     public enum MODE {MAP, SPORT};
 
-    public RecyclerviewAdapter(Context context, List<Pair<String,String>> sportInformation, String informationType){
+    public RecyclerviewAdapter(Context context, List<Pair<String,String>> sportInformation, final int USAGE_TYPE){
         information = sportInformation;
         this.context = context;
-        this.informationType = informationType;
+        this.USAGE_TYPE = USAGE_TYPE;
     }
 
 
@@ -63,7 +63,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
             sport_name = itemView.findViewById(R.id.sport_name_textview);
             participants = itemView.findViewById(R.id.participants_textview);
             btn.setOnClickListener(view -> {
-                EventCreator.fillEvent(informationType, getAdapterPosition());
+                EventCreator.applyChanges(USAGE_TYPE, getAdapterPosition());
                 EventCreator.dialog.dismiss();
             });
         }
