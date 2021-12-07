@@ -31,5 +31,10 @@
     <string name="sport_name">Sport name</string>
     <string name="participants_number"> 13 people</string>
 
+    <!-- User Profile -->
+    <string name="your_upcoming_events">Your Upcoming Events:</string>
+    <string name="edit">Edit Profile</string>
+    <string name="settings">Settings</string>
+    <string name="friends">Friends</string>
 
 </resources>

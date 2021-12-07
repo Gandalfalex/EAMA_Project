@@ -24,7 +24,7 @@
         app:layout_constraintVertical_bias="0.8"
         app:fabCustomSize="75dp"
         app:maxImageSize="50dp"
-        app:srcCompat="@drawable/ic_add_white_24dp"/>
+        app:srcCompat="@drawable/ic_add_white"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
