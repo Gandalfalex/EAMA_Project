@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meetforsport.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapter.SViewHolder> {
@@ -26,6 +27,9 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
     public RecyclerviewAdapter(Context context, List<Pair<String,String>> sportInformation, final int USAGE_TYPE){
         information = sportInformation;
+        if (sportInformation.isEmpty() || sportInformation == null){
+            sportInformation = new ArrayList<>();
+        }
         this.context = context;
         this.USAGE_TYPE = USAGE_TYPE;
     }
