@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,22 +31,14 @@ import org.json.JSONObject;
 
 public class EventFragment extends Fragment {
 
-    private EventViewModel dashboardViewModel;
+    private EventViewModel eventViewModel;
     private FragmentEventBinding binding;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel = new ViewModelProvider(this).get(EventViewModel.class);
+        eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
 
         binding = FragmentEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
 
         View v = inflater.inflate(R.layout.fragment_event, container,false);
         FloatingActionButton button = (FloatingActionButton) v.findViewById(R.id.fab_newEvent_EventMode);

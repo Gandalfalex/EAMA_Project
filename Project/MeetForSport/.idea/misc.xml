@@ -26,12 +26,32 @@
         <entry key="..\:/Users/ICH/Documents/Semester_9/Engineering adaptive mobile applications/project/EAMA_Project/Project/MeetForSport/app/src/main/res/layout/fragment_user.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/ICH/Documents/Semester_9/Engineering adaptive mobile applications/project/EAMA_Project/Project/MeetForSport/app/src/main/res/layout/recyclerview_information_holder.xml" value="0.26268115942028986" />
         <entry key="..\:/Users/ICH/Documents/Semester_9/Engineering adaptive mobile applications/project/EAMA_Project/Project/MeetForSport/app/src/main/res/menu/bottom_nav_menu.xml" value="0.36666666666666664" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.20677083333333332" />
+        <entry key="app/src/main/res/drawable/custom_border.xml" value="0.20677083333333332" />
         <entry key="app/src/main/res/drawable/ic_add_white_24dp.xml" value="0.19947916666666668" />
+        <entry key="app/src/main/res/drawable/ic_baseline_format_list_bulleted.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_gps_fixed.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_map.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_participants.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person.xml" value="0.20677083333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.20677083333333332" />
+        <entry key="app/src/main/res/drawable/ic_baseline_sport.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_friends.xml" value="0.1875" />
+        <entry key="app/src/main/res/drawable/ic_home_black_24dp.xml" value="0.20677083333333332" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.20677083333333332" />
+        <entry key="app/src/main/res/drawable/ic_notifications_black_24dp.xml" value="0.20677083333333332" />
+        <entry key="app/src/main/res/drawable/round_button.xml" value="0.3296296296296296" />
+        <entry key="app/src/main/res/drawable/textlines.xml" value="0.32314814814814813" />
+        <entry key="app/src/main/res/layout/activity_event_creator.xml" value="0.190625" />
+        <entry key="app/src/main/res/layout/activity_find_position.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.18333333333333332" />
         <entry key="app/src/main/res/layout/dialog_recycler.xml" value="0.18333333333333332" />
+        <entry key="app/src/main/res/layout/event_recyclerview_information_holder.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/fragment_event.xml" value="0.2" />
         <entry key="app/src/main/res/layout/fragment_map.xml" value="0.1539855072463768" />
-        <entry key="app/src/main/res/layout/fragment_user.xml" value="0.18333333333333332" />
+        <entry key="app/src/main/res/layout/fragment_user.xml" value="0.2" />
+        <entry key="app/src/main/res/layout/recyclerview_event_list_element.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/recyclerview_information_holder.xml" value="0.18333333333333332" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.18333333333333332" />
       </map>
