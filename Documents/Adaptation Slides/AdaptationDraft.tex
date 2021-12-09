@@ -73,6 +73,11 @@
 \section{Context Features}
 \begin{frame}   
 	\frametitle{Context features to control our adaptation}
+	\begin{itemize}
+		\item lokale SQL database
+		\item small and lightweight json get and post requests?
+		\item find efficient way to listen for new events
+	\end{itemize}
 \end{frame}
 
 
@@ -81,6 +86,10 @@
 \section{Adaptation Mechanisms}
 \begin{frame}   
 	\frametitle{Adaptation Mechanisms}
+	\begin{itemize}
+		\item Adapt Data Transfer, instead of sending complete information, only send necessary parts, lazy evaluation of data
+		\item Store events you participate in locally, create event hash for synchronization (should be smaller than complete object, however, it will interfere with energy challenge to some degree (complexe calculation <-> less data to transfer) 
+	\end{itemize}
 \end{frame}
 
 
@@ -89,6 +98,13 @@
 \section{MAPE-K}
 \begin{frame}   
 	\frametitle{MAPE-K}
+	\begin{itemize}
+		\item Monitor - Sensor Data (of gps and internet connection) only when needed, limited background processes
+    		\item Analyze - check event information like time and day 
+    		\item Plan - if current\_time + threshold >= event\_time => check for updates on event
+    		\item Execute - ask server for new hash of event -> if same, do nothing, else fetch data again
+    		\item Knowledge - store personal and event information locally
+	\end{itemize}
 \end{frame}
 
 
@@ -97,6 +113,9 @@
 \section{Detailed Architecture and Technology Choice}
 \begin{frame}
 	\frametitle{Detailed architecture and technology choice}
+	\begin{itemize}
+		\item 
+	\end{itemize}
 \end{frame}
 
 
