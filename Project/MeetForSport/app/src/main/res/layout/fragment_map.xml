@@ -29,6 +29,7 @@
         android:backgroundTint="?colorPrimary"
         android:layout_marginBottom="?attr/actionBarSize"
         android:contentDescription="@string/new_Event"
+        app:backgroundTint="?colorPrimary"
         app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -6,6 +6,50 @@
     android:layout_height="match_parent"
     tools:context=".ui.EventMode.EventFragment">
 
+    <RelativeLayout
+        android:id="@+id/filter_and_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/filter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_filter"
+            android:drawableTint="@color/white"
+            android:minHeight="0dp"
+            android:paddingVertical="4dp"
+            android:text="Filter" />
+
+        <Button
+            android:id="@+id/order_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_arrow_drop_down"
+            android:drawableTint="@color/white"
+            android:minHeight="0dp"
+            android:paddingVertical="4dp"
+            android:layout_alignParentEnd="true"
+            android:text="Order"
+            />
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/events_recycler_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginBottom="?attr/actionBarSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/filter_and_order" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_newEvent_EventMode"
         android:layout_width="75dp"
@@ -15,6 +59,7 @@
         android:backgroundTint="?colorPrimary"
         android:layout_marginBottom="?attr/actionBarSize"
         android:contentDescription="@string/new_Event"
+        app:backgroundTint="?colorPrimary"
         app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,6 +70,13 @@
         app:fabCustomSize="75dp"
         app:maxImageSize="50dp"
         app:srcCompat="@drawable/ic_add_white"/>
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/filter_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
