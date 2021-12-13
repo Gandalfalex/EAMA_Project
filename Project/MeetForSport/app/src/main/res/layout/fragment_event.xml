@@ -71,12 +71,4 @@
         app:maxImageSize="50dp"
         app:srcCompat="@drawable/ic_add_white"/>
 
-    <androidx.drawerlayout.widget.DrawerLayout
-        android:id="@+id/filter_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

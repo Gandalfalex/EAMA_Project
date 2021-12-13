@@ -28,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.R;
 import com.example.meetforsport.databinding.FragmentEventBinding;
+import com.example.meetforsport.ui.EventCreator.EventCreator;
 import com.example.meetforsport.ui.ServerCommunication.GetRequestCreator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -37,10 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class EventFragment extends Fragment {
+public class EventFragment extends Fragment implements View.OnClickListener {
 
     private EventViewModel eventViewModel;
     private FragmentEventBinding binding;
+    private DrawerLayout filterDrawerLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
@@ -49,31 +51,19 @@ public class EventFragment extends Fragment {
         View root = binding.getRoot();
 
         View v = inflater.inflate(R.layout.fragment_event, container,false);
-        DrawerLayout filterDrawerLayout = (DrawerLayout) v.findViewById(R.id.filter_drawer);
 
-        FloatingActionButton button = (FloatingActionButton) v.findViewById(R.id.fab_newEvent_EventMode);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GetRequestCreator requestCreator = GetRequestCreator.getInstance(getContext());
-                requestCreator.addToRequestQueue(createJsonRequest(getContext()));
-                Log.d("Click", "CLICK..");
-            }
-        });
+        FloatingActionButton button = (FloatingActionButton) root.findViewById(R.id.fab_newEvent_EventMode);
+        button.setOnClickListener(this);
 
-        Button filterButton = v.findViewById(R.id.filter_button);
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.e("CLICK","CLICK");
-                filterDrawerLayout.openDrawer(GravityCompat.END);
-            }
-        });
+        Button filterButton = root.findViewById(R.id.filter_button);
+        filterButton.setOnClickListener(this);
+
+        //filterDrawerLayout = (DrawerLayout) root.findViewById(R.id.filter_drawer);
 
         RecyclerView recyclerView = root.findViewById(R.id.events_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(new RecyclerViewAdapter(getContext(), DummyEvents()));
-
+        Log.e("Test","Test");
         return root;
     }
 
@@ -115,5 +105,23 @@ public class EventFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onClick(View v){
+        Log.e("CLICK","CLICK");
+        switch (v.getId()){
+            case R.id.fab_newEvent_EventMode:
+                Log.e("CLICK","CLICK");
+                //GetRequestCreator requestCreator = GetRequestCreator.getInstance(getContext());
+                //requestCreator.addToRequestQueue(createJsonRequest(getContext()));
+                Intent intent = new Intent(getActivity() , EventCreator.class);
+                startActivity(intent);
+                break;
+            case R.id.filter_button:
+                Log.e("CLICK","CLICK");
+                //filterDrawerLayout.openDrawer(GravityCompat.END);
+                break;
+        }
     }
 }
