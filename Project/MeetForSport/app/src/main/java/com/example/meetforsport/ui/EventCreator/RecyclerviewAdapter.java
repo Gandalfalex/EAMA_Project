@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meetforsport.R;
+import com.example.meetforsport.ui.EventCreator.DataHolder.DataHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.SportHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +22,19 @@ import java.util.List;
 public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapter.SViewHolder> {
 
 
-    private List<Pair<String,String>> information;
+    private List<DataHolder> information;
     private Context context;
-    private final int USAGE_TYPE;
+    private MODE mode;
 
-    public enum MODE {MAP, SPORT};
+    public static enum MODE {MAP, SPORT};
 
-    public RecyclerviewAdapter(Context context, List<Pair<String,String>> sportInformation, final int USAGE_TYPE){
-        information = sportInformation;
-        if (sportInformation.isEmpty() || sportInformation == null){
-            sportInformation = new ArrayList<>();
+    public RecyclerviewAdapter(Context context, List<DataHolder> information, MODE mode){
+        this.information = information;
+        if (information.isEmpty() || information == null){
+            information = new ArrayList<>();
         }
         this.context = context;
-        this.USAGE_TYPE = USAGE_TYPE;
+        this.mode = mode;
     }
 
 
@@ -45,8 +48,15 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull SViewHolder holder, int position) {
-        holder.sport_name.setText(information.get(position).first);
-        holder.participants.setText(information.get(position).second);
+        holder.sport_name.setText(information.get(position).getName());
+        if (mode.equals(MODE.SPORT)) {
+            holder.participants.setText(((SportHolder) information.get(position)).getMinPlayer()
+                        + " - " +       ((SportHolder) information.get(position)).getMaxPlayer());
+        }
+        else if (mode.equals(MODE.MAP)){
+            holder.participants.setText(((LocationHolder) information.get(position)).getL_address());
+        }
+
     }
 
     @Override
@@ -67,7 +77,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
             sport_name = itemView.findViewById(R.id.sport_name_textview);
             participants = itemView.findViewById(R.id.participants_textview);
             btn.setOnClickListener(view -> {
-                EventCreator.applyChanges(USAGE_TYPE, getAdapterPosition());
+                EventCreator.applyChanges(mode, getAdapterPosition());
                 EventCreator.dialog.dismiss();
             });
         }
