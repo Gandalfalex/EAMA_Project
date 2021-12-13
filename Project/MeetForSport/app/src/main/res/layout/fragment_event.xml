@@ -1,74 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/filter_drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.EventMode.EventFragment">
 
-    <RelativeLayout
-        android:id="@+id/filter_and_order"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/filter_button"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/filter_and_order"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_filter"
-            android:drawableTint="@color/white"
-            android:minHeight="0dp"
-            android:paddingVertical="4dp"
-            android:text="Filter" />
+            android:orientation="horizontal"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/order_button"
-            android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/filter_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_filter"
+                android:drawableTint="@color/white"
+                android:minHeight="0dp"
+                android:paddingVertical="4dp"
+                android:text="@string/filter" />
+
+            <Button
+                android:id="@+id/order_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableEnd="@drawable/ic_arrow_drop_down"
+                android:drawableTint="@color/white"
+                android:minHeight="0dp"
+                android:paddingVertical="4dp"
+                android:layout_alignParentEnd="true"
+                android:text="@string/order"
+                />
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/events_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginBottom="?attr/actionBarSize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/filter_and_order" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_newEvent_EventMode"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="0dp"
+            android:backgroundTint="?colorPrimary"
+            android:layout_marginBottom="?attr/actionBarSize"
+            android:contentDescription="@string/new_Event"
+            app:backgroundTint="?colorPrimary"
+            app:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.95"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.8"
+            app:fabCustomSize="75dp"
+            app:maxImageSize="50dp"
+            app:srcCompat="@drawable/ic_add_white"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/lighter_grey"
+        android:layout_gravity="end">
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_arrow_drop_down"
-            android:drawableTint="@color/white"
-            android:minHeight="0dp"
-            android:paddingVertical="4dp"
-            android:layout_alignParentEnd="true"
-            android:text="Order"
-            />
-    </RelativeLayout>
+            android:gravity="center"
+            android:paddingVertical="8dp"
+            android:textSize="16sp"
+            android:text="@string/search_filter"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/events_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="4dp"
-        android:layout_marginBottom="?attr/actionBarSize"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_and_order" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginVertical="8dp"
+            android:paddingVertical="8dp"
+            android:background="@color/white">
+            <TextView
+                android:layout_marginStart="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="Radius:"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_newEvent_EventMode"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="0dp"
-        android:backgroundTint="?colorPrimary"
-        android:layout_marginBottom="?attr/actionBarSize"
-        android:contentDescription="@string/new_Event"
-        app:backgroundTint="?colorPrimary"
-        app:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8"
-        app:fabCustomSize="75dp"
-        app:maxImageSize="50dp"
-        app:srcCompat="@drawable/ic_add_white"/>
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stepSize="1.0"
+                app:tickVisible="false"
+                app:labelBehavior="gone"
+                android:valueFrom="0"
+                android:valueTo="50" />
+        </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginVertical="8dp"
+            android:paddingVertical="8dp"
+            android:background="@color/white">
+            <TextView
+                android:layout_marginStart="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/sports"/>
+
+            <Button
+                android:layout_marginHorizontal="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/lighter_grey"
+                android:textColor="@color/light_grey"
+                android:drawableEnd="@drawable/ic_arrow_drop_down"
+                android:text="@string/all_selected"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -58,7 +58,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         Button filterButton = root.findViewById(R.id.filter_button);
         filterButton.setOnClickListener(this);
 
-        //filterDrawerLayout = (DrawerLayout) root.findViewById(R.id.filter_drawer);
+        filterDrawerLayout = (DrawerLayout) root.findViewById(R.id.filter_drawer);
 
         RecyclerView recyclerView = root.findViewById(R.id.events_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
@@ -120,7 +120,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.filter_button:
                 Log.e("CLICK","CLICK");
-                //filterDrawerLayout.openDrawer(GravityCompat.END);
+                filterDrawerLayout.openDrawer(GravityCompat.END);
                 break;
         }
     }
