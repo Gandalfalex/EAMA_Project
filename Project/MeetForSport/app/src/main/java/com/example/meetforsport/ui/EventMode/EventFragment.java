@@ -1,23 +1,24 @@
 package com.example.meetforsport.ui.EventMode;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,20 +30,23 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.R;
 import com.example.meetforsport.databinding.FragmentEventBinding;
 import com.example.meetforsport.ui.EventCreator.EventCreator;
-import com.example.meetforsport.ui.ServerCommunication.GetRequestCreator;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.slider.Slider;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class EventFragment extends Fragment implements View.OnClickListener {
 
     private EventViewModel eventViewModel;
     private FragmentEventBinding binding;
-    private DrawerLayout filterDrawerLayout;
+    private int selectedOrderOption = 1;
+    private boolean[] selectedSports = {true, true, true, true, true};
+    private int searchRadius = 5;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
@@ -52,18 +56,31 @@ public class EventFragment extends Fragment implements View.OnClickListener {
 
         View v = inflater.inflate(R.layout.fragment_event, container,false);
 
-        FloatingActionButton button = (FloatingActionButton) root.findViewById(R.id.fab_newEvent_EventMode);
-        button.setOnClickListener(this);
+        //add fragment as click listener for buttons
+        root.findViewById(R.id.fab_newEvent_EventMode).setOnClickListener(this);
+        root.findViewById(R.id.filters_btn).setOnClickListener(this);
+        root.findViewById(R.id.apply_filters_btn).setOnClickListener(this);
+        root.findViewById(R.id.sports_selection_btn).setOnClickListener(this);
+        root.findViewById(R.id.order_btn).setOnClickListener(this);
 
-        Button filterButton = root.findViewById(R.id.filter_button);
-        filterButton.setOnClickListener(this);
+        //connect search radius slider to textview
+        TextView searchRadiusTV = root.findViewById(R.id.search_radius_tv);
+        searchRadiusTV.setText(getResources().getString(R.string.search_radius, searchRadius));
+        Slider searchRadiusSlider = root.findViewById(R.id.search_radius_slider);
+        searchRadiusSlider.setValue(searchRadius);
+        searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                searchRadius = Math.round(value);
+                searchRadiusTV.setText(getResources().getString(R.string.search_radius, searchRadius));
+            }
+        });
 
-        filterDrawerLayout = (DrawerLayout) root.findViewById(R.id.filter_drawer);
-
+        //fill recycler view with dummy events
         RecyclerView recyclerView = root.findViewById(R.id.events_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(new RecyclerViewAdapter(getContext(), DummyEvents()));
-        Log.e("Test","Test");
+
         return root;
     }
 
@@ -109,19 +126,83 @@ public class EventFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v){
-        Log.e("CLICK","CLICK");
         switch (v.getId()){
             case R.id.fab_newEvent_EventMode:
-                Log.e("CLICK","CLICK");
                 //GetRequestCreator requestCreator = GetRequestCreator.getInstance(getContext());
                 //requestCreator.addToRequestQueue(createJsonRequest(getContext()));
                 Intent intent = new Intent(getActivity() , EventCreator.class);
                 startActivity(intent);
                 break;
-            case R.id.filter_button:
-                Log.e("CLICK","CLICK");
-                filterDrawerLayout.openDrawer(GravityCompat.END);
+            case R.id.filters_btn:
+                ((DrawerLayout) v.getRootView().findViewById(R.id.drawer_EventMode)).openDrawer(GravityCompat.END);
+                break;
+            case R.id.apply_filters_btn:
+                ((DrawerLayout) v.getRootView().findViewById(R.id.drawer_EventMode)).closeDrawer(GravityCompat.END);
+                break;
+            case R.id.order_btn:
+                showOrderSelectionDialog();
+                break;
+            case R.id.sports_selection_btn:
+                showSportsSelectionDialog();
                 break;
         }
+    }
+
+    /**
+     * Create a dialog with the order options to choose from. Only one selection is possible.
+     */
+    private void showOrderSelectionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(getResources().getString(R.string.ordered_by));
+
+        String[] items = getResources().getStringArray(R.array.order_options);
+        builder.setSingleChoiceItems(items, selectedOrderOption, null);
+        builder.setPositiveButton(getResources().getString(R.string.apply), (dialogInterface, i) -> {
+            ListView list = ((AlertDialog) dialogInterface).getListView();
+            selectedOrderOption = list.getCheckedItemPosition();
+            Log.e("dialog", selectedOrderOption+"");
+            //TODO apply order to list
+        });
+
+        builder.setNegativeButton(getResources().getString(R.string.cancel), null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    /**
+     * Create a dialog with the list of sports to choose from. Multiple Choices are possible.
+     */
+    private void showSportsSelectionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(getResources().getString(R.string.sports));
+
+        //just temporary, will be connected with database in the future
+        String[] sports = {"Select All", "Football", "Basketball", "Volley Ball", "Running"};
+
+        builder.setMultiChoiceItems(sports, selectedSports, new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                ListView list = ((AlertDialog) dialog).getListView();
+                //set all others to true when "select all" is checked
+                if (which==0 && isChecked) {
+                    for (int i = 0; i < list.getCount(); i++) {
+                        list.setItemChecked(i, true);
+                        selectedSports[i] = true;
+                    }
+                } else if (which>0) {
+                    selectedSports[which] = isChecked;
+                    //set "select all" to false if any item is unchecked
+                    if (!isChecked) {
+                        list.setItemChecked(0, false);
+                        selectedSports[0] = false;
+                    }
+                }
+            }
+        });
+        builder.setPositiveButton("OK", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

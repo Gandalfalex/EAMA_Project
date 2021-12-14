@@ -69,6 +69,11 @@ public class UserFragment extends Fragment {
         binding = null;
     }
 
+    /**
+     * Crops a circular image from an input image.
+     * @param image input image
+     * @return cropped image
+     */
     private static Bitmap cropCircularImage(Bitmap image) {
         int widthLight = image.getWidth();
         int heightLight = image.getHeight();

@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/filter_drawer"
+    android:id="@+id/drawer_EventMode"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.EventMode.EventFragment">
@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
         <RelativeLayout
-            android:id="@+id/filter_and_order"
+            android:id="@+id/filters_and_order_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -24,17 +24,17 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <Button
-                android:id="@+id/filter_button"
+                android:id="@+id/filters_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/ic_filter"
                 android:drawableTint="@color/white"
                 android:minHeight="0dp"
                 android:paddingVertical="4dp"
-                android:text="@string/filter" />
+                android:text="@string/filters" />
 
             <Button
-                android:id="@+id/order_button"
+                android:id="@+id/order_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableEnd="@drawable/ic_arrow_drop_down"
@@ -55,7 +55,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/filter_and_order" />
+            app:layout_constraintTop_toBottomOf="@id/filters_and_order_layout" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_newEvent_EventMode"
@@ -80,52 +80,62 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <!-- filters drawer-->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="240dp"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/lighter_grey"
-        android:layout_gravity="end">
+        android:layout_gravity="end"
+        android:layout_marginBottom="?actionBarSize">
         <TextView
+            android:id="@+id/filters_drawer_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingVertical="8dp"
+            android:paddingTop="8dp"
             android:textSize="16sp"
-            android:text="@string/search_filter"/>
+            android:text="@string/search_filters"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:id="@+id/search_radius_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginVertical="8dp"
             android:paddingVertical="8dp"
-            android:background="@color/white">
+            android:background="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/filters_drawer_header">
             <TextView
+                android:id="@+id/search_radius_tv"
                 android:layout_marginStart="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:text="Radius:"/>
+                android:textSize="16sp" />
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/search_radius_slider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:stepSize="1.0"
                 app:tickVisible="false"
                 app:labelBehavior="gone"
-                android:valueFrom="0"
+                android:valueFrom="1"
                 android:valueTo="50" />
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/sports_selection_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginVertical="8dp"
             android:paddingVertical="8dp"
-            android:background="@color/white">
+            android:background="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/search_radius_layout">
+
             <TextView
+                android:id="@+id/sports_selection_tv"
                 android:layout_marginStart="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -133,6 +143,7 @@
                 android:text="@string/sports"/>
 
             <Button
+                android:id="@+id/sports_selection_btn"
                 android:layout_marginHorizontal="4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -143,6 +154,20 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+        <Button
+            android:id="@+id/apply_filters_btn"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd="@drawable/ic_search"
+            android:text="@string/apply_filters"
+            android:drawableTint="@color/white"
+            android:layout_marginVertical="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
