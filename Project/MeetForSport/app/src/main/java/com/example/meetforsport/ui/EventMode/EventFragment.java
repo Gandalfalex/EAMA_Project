@@ -5,12 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,12 +48,15 @@ public class EventFragment extends Fragment implements View.OnClickListener {
 
     private EventViewModel eventViewModel;
     private FragmentEventBinding binding;
-    private int selectedOrderOption = 1;
-    private boolean[] selectedSports = {true, true, true, true, true};
-    private int searchRadius = 5;
+
+    private Button sportSelectionBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
+        //fill viewModel
+        eventViewModel.setSelectedSearchRadius(5);
+        eventViewModel.setSelectedOrderOption(1);
+        eventViewModel.setSelectedSports(new boolean[]{true, true, true, true, true});
 
         binding = FragmentEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -57,22 +64,79 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         View v = inflater.inflate(R.layout.fragment_event, container,false);
 
         //add fragment as click listener for buttons
+        sportSelectionBtn = root.findViewById(R.id.sports_selection_btn);
+        sportSelectionBtn.setOnClickListener(this);
         root.findViewById(R.id.fab_newEvent_EventMode).setOnClickListener(this);
         root.findViewById(R.id.filters_btn).setOnClickListener(this);
         root.findViewById(R.id.apply_filters_btn).setOnClickListener(this);
-        root.findViewById(R.id.sports_selection_btn).setOnClickListener(this);
         root.findViewById(R.id.order_btn).setOnClickListener(this);
+
+        //connect min max editText for participants to viewModel
+        EditText numOfParticipantsMinET = (EditText) root.findViewById(R.id.num_of_participants_min_et);
+        numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String eString = editable.toString();
+                if (eString.length() > 3) {
+                    //prevent numbers higher than 999
+                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
+                } else if (eString.length() > 0) {
+                    Integer newMin = Integer.parseInt(eString);
+                    //prevent leading zeros
+                    if (newMin == 0) {
+                        newMin = null;
+                        editable.replace(0, eString.length(), "");
+                    }
+                    eventViewModel.setMinNumOfParticipants(newMin);
+                } else {
+                    eventViewModel.setMinNumOfParticipants(null);
+                }
+            }
+        });
+
+        ((EditText) root.findViewById(R.id.num_of_participants_max_et)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String eString = editable.toString();
+                if (eString.length() > 3) {
+                    //prevent numbers higher than 999
+                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
+                } else if (eString.length() > 0) {
+                    Integer newMax = Integer.parseInt(eString);
+                    //prevent leading zeros
+                    if (newMax == 0) {
+                        newMax = null;
+                        editable.replace(0, eString.length(), "");
+                    }
+                    eventViewModel.setMaxNumOfParticipants(newMax);
+                } else {
+                    eventViewModel.setMaxNumOfParticipants(null);
+                }
+            }
+        });
 
         //connect search radius slider to textview
         TextView searchRadiusTV = root.findViewById(R.id.search_radius_tv);
-        searchRadiusTV.setText(getResources().getString(R.string.search_radius, searchRadius));
+        searchRadiusTV.setText(getResources().getString(R.string.search_radius, eventViewModel.getSelectedSearchRadius()));
         Slider searchRadiusSlider = root.findViewById(R.id.search_radius_slider);
-        searchRadiusSlider.setValue(searchRadius);
+        searchRadiusSlider.setValue(eventViewModel.getSelectedSearchRadius());
         searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
             @Override
             public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                searchRadius = Math.round(value);
-                searchRadiusTV.setText(getResources().getString(R.string.search_radius, searchRadius));
+                eventViewModel.setSelectedSearchRadius(Math.round(value));
+                searchRadiusTV.setText(getResources().getString(R.string.search_radius, eventViewModel.getSelectedSearchRadius()));
             }
         });
 
@@ -114,12 +178,17 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         myList.add(new Pair<>("Basketball", "14:00, 24.12.21"));
         myList.add(new Pair<>("Football", "12:00, 01.01.22"));
         myList.add(new Pair<>("Football", "18:00, 07.01.22"));
+        myList.add(new Pair<>("Football", "16:30, 8.12.21"));
+        myList.add(new Pair<>("Running", "12:00, 14.12.21"));
+        myList.add(new Pair<>("Basketball", "14:00, 24.12.21"));
+        myList.add(new Pair<>("Football", "12:00, 01.01.22"));
+        myList.add(new Pair<>("Football", "18:00, 07.01.22"));
 
         return myList;
     }
 
     @Override
-    public void onDestroyView() {
+    public void onDestroyView(){
         super.onDestroyView();
         binding = null;
     }
@@ -138,6 +207,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.apply_filters_btn:
                 ((DrawerLayout) v.getRootView().findViewById(R.id.drawer_EventMode)).closeDrawer(GravityCompat.END);
+                //TODO new search query with applied filters
                 break;
             case R.id.order_btn:
                 showOrderSelectionDialog();
@@ -156,11 +226,10 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         builder.setTitle(getResources().getString(R.string.ordered_by));
 
         String[] items = getResources().getStringArray(R.array.order_options);
-        builder.setSingleChoiceItems(items, selectedOrderOption, null);
+        builder.setSingleChoiceItems(items, eventViewModel.getSelectedOrderOption(), null);
         builder.setPositiveButton(getResources().getString(R.string.apply), (dialogInterface, i) -> {
             ListView list = ((AlertDialog) dialogInterface).getListView();
-            selectedOrderOption = list.getCheckedItemPosition();
-            Log.e("dialog", selectedOrderOption+"");
+            eventViewModel.setSelectedOrderOption(list.getCheckedItemPosition());
             //TODO apply order to list
         });
 
@@ -180,15 +249,25 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         //just temporary, will be connected with database in the future
         String[] sports = {"Select All", "Football", "Basketball", "Volley Ball", "Running"};
 
-        builder.setMultiChoiceItems(sports, selectedSports, new DialogInterface.OnMultiChoiceClickListener() {
+        builder.setMultiChoiceItems(sports, eventViewModel.getSelectedSports(), new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 ListView list = ((AlertDialog) dialog).getListView();
-                //set all others to true when "select all" is checked
-                if (which==0 && isChecked) {
-                    for (int i = 0; i < list.getCount(); i++) {
-                        list.setItemChecked(i, true);
-                        selectedSports[i] = true;
+                boolean[] selectedSports = eventViewModel.getSelectedSports();
+                int numberOfItems = selectedSports.length;
+                if (which==0) {
+                    //set all others to true when "select all" is checked
+                    if (isChecked) {
+                        for (int i = 0; i < list.getCount(); i++) {
+                            list.setItemChecked(i, true);
+                            selectedSports[i] = true;
+                        }
+                    //set all others to false when "select all" is unchecked
+                    } else {
+                        for (int i = 0; i < list.getCount(); i++) {
+                            list.setItemChecked(i, false);
+                            selectedSports[i] = false;
+                        }
                     }
                 } else if (which>0) {
                     selectedSports[which] = isChecked;
@@ -197,7 +276,19 @@ public class EventFragment extends Fragment implements View.OnClickListener {
                         list.setItemChecked(0, false);
                         selectedSports[0] = false;
                     }
+                    //set "select alL" to true if all items are checked
+                    if (!selectedSports[0] && list.getCheckedItemCount()==(numberOfItems-1)) {
+                        list.setItemChecked(0, true);
+                        selectedSports[0] = true;
+                    }
                 }
+                //change text on button to say the number of selected sports
+                if (list.getCheckedItemCount() == numberOfItems) {
+                    sportSelectionBtn.setText(getResources().getString(R.string.all_selected));
+                } else {
+                    sportSelectionBtn.setText(getResources().getString(R.string.number_selected,list.getCheckedItemCount()));
+                }
+                eventViewModel.setSelectedSports(selectedSports);
             }
         });
         builder.setPositiveButton("OK", null);

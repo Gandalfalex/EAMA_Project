@@ -154,6 +154,51 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/num_of_participants_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginVertical="8dp"
+            android:paddingVertical="8dp"
+            android:background="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/sports_selection_layout">
+
+            <TextView
+                android:id="@+id/num_of_participants_tv"
+                android:layout_marginStart="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/number_of_participants"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <EditText
+                    android:id="@+id/num_of_participants_min_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:layout_marginHorizontal="24dp"
+                    android:hint="@string/min"
+                    android:layout_weight=".5" />
+
+                <EditText
+                    android:id="@+id/num_of_participants_max_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:layout_marginHorizontal="24dp"
+                    android:hint="@string/max"
+                    android:layout_weight=".5" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/apply_filters_btn"
             android:layout_gravity="center"
