@@ -25,17 +25,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Map;
+
 public class MapFragment extends Fragment implements View.OnClickListener, OnMapReadyCallback {
 
     private MapViewModel mapViewModel;
-    public MapView mapView;
     private FragmentMapBinding binding;
     private GoogleMap googleMap;
+    private static final String MAP_KEY = "MapViewBundleKey";
+    private MapView mapView;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
@@ -56,53 +61,25 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         FloatingActionButton button = (FloatingActionButton) v.findViewById(R.id.fab_newEvent_MapMode);
         button.setOnClickListener(this);
 
+        Bundle mapViewBundle = (savedInstanceState != null) ? savedInstanceState.getBundle(MAP_KEY) : null;
+        mapView = v.findViewById(R.id.mapView);
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
 
-
-
-
-        mapView = root.findViewById(R.id.mapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.onResume();
-        try {
-            MapsInitializer.initialize(getContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(@NonNull GoogleMap gMap) {
-                googleMap = gMap;
-
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PackageManager.PERMISSION_GRANTED);
-                    //return;
-                }
-                else {Log.d("Permission", "Permission was granted");}
-                googleMap.setMyLocationEnabled(true);
-
-                // For dropping a marker at a point on the Map
-                LatLng sydney = new LatLng(-34, 151);
-                googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
-
-                // For zooming automatically to the location of the marker
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            }
-        });
 
         return v;
     }
 
-
     @Override
-    public void onResume(){
-        super.onResume();
-        mapView.onResume();
+    public void onSaveInstanceState(Bundle bundle){
+        super.onSaveInstanceState(bundle);
 
+        Bundle mapBundle = bundle.getBundle(MAP_KEY);
+        if (mapBundle == null){
+            mapBundle = new Bundle();
+            bundle.putBundle(MAP_KEY, mapBundle);
+        }
     }
-
-
 
 
     @Override
@@ -122,28 +99,58 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     }
 
     @Override
-    public void onMapReady(@NonNull GoogleMap gMap) {
-        googleMap = gMap;
-
+    public void onMapReady(GoogleMap googleMap) {
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PackageManager.PERMISSION_GRANTED);
+            //return;
         }
-        else {Log.d("Permission", "Permission was not granted");}
-        googleMap.setMyLocationEnabled(true);
-
-        // For dropping a marker at a point on the Map
-        LatLng sydney = new LatLng(-34, 151);
-        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
-
-        // For zooming automatically to the location of the marker
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        else {Log.d("Permission", "Permission was granted");}
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(0, 0))
+                .title("Marker"));
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        mapView.onStart();
+    }
+    @Override
+    public void onPause(){
+        super.onPause();
+        mapView.onPause();
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+    @Override
+    public void onLowMemory(){
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+
 }
