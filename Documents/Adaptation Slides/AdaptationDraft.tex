@@ -59,7 +59,7 @@ Targeting mostly active persons, this small social network will allow users  to 
 
 \section{Problematic Situations}
 \begin{frame}   
-	\frametitle{Situation 1:  Bad or no internet connection}
+	\frametitle{Situation 1:  No internet connection}
 	 \begin{figure}
 		\centering
 		\includegraphics[width=0.6\textwidth]{media/no_internet.jpg}
@@ -69,49 +69,115 @@ Targeting mostly active persons, this small social network will allow users  to 
 	\frametitle{Situation 2: low battery}
 	 \begin{figure}
 		\centering
-		\includegraphics[width=0.6\textwidth]{media/no_internet.jpg}
+		\includegraphics[width=0.4\textwidth]{media/low_battery.jpg}
 	\end{figure}
 \end{frame}
 
 
 
 
-\section{Context Features}
+\section{Situation 1:  Offline Challenge}
 \begin{frame}   
-	\frametitle{Context features to control our adaptation}
+	\frametitle{Situation 1:  Storyboard}
+	\begin{columns}
+	  \column{0.3\linewidth} 
+		\begin{itemize}
+			\item Persona: Fred Flintstone, Student
+			\item Scenario: Check event information on the go
+		\end{itemize}
+		 \column{0.45\linewidth}   
+		 \begin{figure}
+			\centering
+			\includegraphics[width=1\textwidth]{media/storyboard1.jpg}
+		\end{figure}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Situation 1: Context Model}
+	 \begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth]{media/contextmodel1.jpg}
+	\end{figure}
+\end{frame}
+
+\begin{frame}   
+	\frametitle{Situation 1: MAPE-K}
 	\begin{itemize}
-		\item lokale SQL database
-		\item small and lightweight json get and post requests?
-		\item find efficient way to listen for new events
+		\item Monitor: Network state, Package loss, Bandwidth
+		\item Analyze: 
+			 \begin{itemize} 
+				\item Case 1: No connection
+				\item Case 2: Stable connection
+			\end{itemize}
+		\item Plan:
+			\begin{itemize}
+				\item Case 1: use cached data 
+				\item Case 2:  update data
+			\end{itemize}
+		\item Execute:
+			\begin{itemize}
+				\item Case 1: load cached data, ignore online messages
+    				\item Case 2: send requests for updates, fetch only web data 
+			\end{itemize}
+		\item Knowledge: Store behavior model in Android Preferences
 	\end{itemize}
 \end{frame}
 
 
 
 
-\section{Adaptation Mechanisms}
+\section{Situation 2:  Energy Challenge}
 \begin{frame}   
-	\frametitle{Adaptation Mechanisms}
+	\frametitle{Situation 2:  Storyboard}
+	\begin{columns}
+	  \column{0.3\linewidth} 
+		\begin{itemize}
+			\item Persona: Martina Rina, Car Mechanic
+			\item Scenario: Low battery status
+		\end{itemize}
+		 \column{0.45\linewidth}   
+		 \begin{figure}
+			\centering
+			\includegraphics[width=1\textwidth]{media/storyboard2.jpg}
+		\end{figure}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Situation 2: Context Model}
+	 \begin{figure}
+		\centering
+		\includegraphics[width=0.7\textwidth]{media/contextmodel2.jpg}
+	\end{figure}
+\end{frame}
+
+\begin{frame}   
+	\frametitle{Situation 1: MAPE-K}
 	\begin{itemize}
-		\item Adapt Data Transfer, instead of sending complete information, only send necessary parts, lazy evaluation of data
-		\item Store events you participate in locally, create event hash for synchronization (should be smaller than complete object, however, it will interfere with energy challenge to some degree (complexe calculation <-> less data to transfer) 
+		\item Monitor: Batterie state, cpu usage while using it
+		\item Analyze: 
+			 \begin{itemize} 
+				\item Case 1: batterie state $<$ LOW \&\& batterie state $>$ CRITICAL
+				\item Case 1: batterie state $<$ LOW \&\& batterie state $<$ CRITICAL
+				\item Case 1: batterie state $>$ LOW \&\& batterie state $<$ CRITICAL
+			\end{itemize}
+		\item Plan:
+			\begin{itemize}
+				\item Case 1: limit gps, fetch only important data 
+				\item Case 2: no gps, only cached data
+				\item Case 3: use ACCESS\_FINE\_LOCATION for GPS, fetch data if possible
+			\end{itemize}
+		\item Execute:
+			\begin{itemize}
+				\item Case 1: set permission to ACCESS\_COARSE\_LOCATION, use cached data for unimportant things
+    				\item Case 2: revoke permissions
+    				\item Case 3: set ACCESS\_FINE\_LOCATION for GPS, grant every Internet permission
+			\end{itemize}
+		\item Knowledge: Store permissions in user preferences
 	\end{itemize}
 \end{frame}
 
-
-
-
-\section{MAPE-K}
-\begin{frame}   
-	\frametitle{MAPE-K}
-	\begin{itemize}
-		\item Monitor - Sensor Data (of gps and internet connection) only when needed, limited background processes
-    		\item Analyze - check event information like time and day 
-    		\item Plan - if current\_time + threshold >= event\_time => check for updates on event
-    		\item Execute - ask server for new hash of event -> if same, do nothing, else fetch data again
-    		\item Knowledge - store personal and event information locally
-	\end{itemize}
-\end{frame}
 
 
 
@@ -121,10 +187,16 @@ Targeting mostly active persons, this small social network will allow users  to 
 	\frametitle{Detailed architecture and technology choice}
 	 \begin{figure}
 		\centering
-		\includegraphics[width=0.6\textwidth]{media/architecture.jpg}
+		\includegraphics[width=0.8\textwidth]{media/architecture.jpg}
 	\end{figure}
 \end{frame}
 
-
+\begin{frame}
+	\frametitle{Detailed architecture and technology choice}
+	 \begin{figure}
+		\centering
+		\includegraphics[width=1\textwidth]{media/entity-relationship-diagram.pdf}
+	\end{figure}
+\end{frame}
 
 \end{document}
