@@ -107,21 +107,18 @@ Targeting mostly active persons, this small social network will allow users  to 
 		\item Monitor: Network state, Package loss, Bandwidth
 		\item Analyze: 
 			 \begin{itemize} 
-				\item Case 1: Network state == mobile Network \& package loss $>$ 5\% \& bandwidth $<$ threshold
-				\item Case 2: Network state == WiFi \& package loss $<$ 5\% \& bandwidth $>$ threshold
-				\item Case 3: Network state == mobile Network \& package loss $<$ 5\% \& bandwidth $>$ threshold
+				\item Case 1: No connection
+				\item Case 2: Stable connection
 			\end{itemize}
 		\item Plan:
 			\begin{itemize}
 				\item Case 1: use cached data 
-				\item Case 2: update data
-				\item Case 3: ask for updates, fetch only important information
+				\item Case 2:  update data
 			\end{itemize}
 		\item Execute:
 			\begin{itemize}
 				\item Case 1: load cached data, ignore online messages
     				\item Case 2: send requests for updates, fetch only web data 
-    				\item Case 3: ask for updates, fetch only important information
 			\end{itemize}
 		\item Knowledge: Store behavior model in Android Preferences
 	\end{itemize}
@@ -198,7 +195,7 @@ Targeting mostly active persons, this small social network will allow users  to 
 	\frametitle{Detailed architecture and technology choice}
 	 \begin{figure}
 		\centering
-		\includegraphics[width=0.8\textwidth]{media/entity-relationship-diagram.pdf}
+		\includegraphics[width=1\textwidth]{media/entity-relationship-diagram.pdf}
 	\end{figure}
 \end{frame}
 
