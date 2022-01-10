@@ -7,12 +7,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +60,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     private static final String MAP_KEY = "MapViewBundleKey";
     private MapView mapView;
     private FusedLocationProviderClient fusedLocationClient;
+    private TextView noPermissionTV;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
@@ -72,6 +75,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
         FloatingActionButton button = (FloatingActionButton) v.findViewById(R.id.fab_newEvent_MapMode);
         button.setOnClickListener(this);
+        noPermissionTV = v.findViewById(R.id.no_permission_tv);
 
         Bundle mapViewBundle = (savedInstanceState != null) ? savedInstanceState.getBundle(MAP_KEY) : null;
         mapView = v.findViewById(R.id.mapView);
@@ -88,7 +92,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            //TODO update current location
+                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
                         }
                     }
                 });
@@ -105,6 +109,20 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         }
     }
 
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_LOCATION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                googleMap.setMyLocationEnabled(true);
+                updateLocation();
+                noPermissionTV.setVisibility(View.INVISIBLE);
+            } else {
+                noPermissionTV.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
     @Override
     public void onDestroyView() {
@@ -124,30 +142,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PackageManager.PERMISSION_GRANTED);
-            //return;
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_CODE);
         }
-        else {Log.d("Permission", "Permission was granted");}
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(0, 0))
-                .title("Marker"));
+        else {
+            googleMap.setMyLocationEnabled(true);
+            updateLocation();
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public void onResume(){

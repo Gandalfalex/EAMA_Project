@@ -61,4 +61,7 @@
         <item>Most Participants </item>
     </string-array>
 
+    <!-- MapMode Fragment -->
+    <string name="no_permissions">Give MeetForSports access to your location to get this functionality.</string>
+
 </resources>

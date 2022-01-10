@@ -32,5 +32,20 @@
         tools:layout_editor_absoluteX="140dp"
         tools:layout_editor_absoluteY="204dp" />
 
+    <TextView
+        android:id="@+id/no_permission_tv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@color/transparent_light_grey"
+        android:textSize="24sp"
+        android:textColor="@color/white"
+        android:visibility="invisible"
+        android:text="@string/no_permissions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
