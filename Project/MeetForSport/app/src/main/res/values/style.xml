@@ -6,4 +6,15 @@
 
         <item name="background"> @color/white</item>
     </style>
+
+    <style name="DialogTheme" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">?colorPrimary</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogTheme.ButtonBarButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogTheme.ButtonBarButtonStyle</item>
+    </style>
+
+    <style name="DialogTheme.ButtonBarButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?colorPrimary</item>
+    </style>
+
 </resources>

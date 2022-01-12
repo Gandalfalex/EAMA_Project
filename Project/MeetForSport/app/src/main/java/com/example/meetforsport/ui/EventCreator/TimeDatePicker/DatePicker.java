@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TimePicker;
 
+import com.example.meetforsport.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -61,7 +63,7 @@ public class DatePicker implements  View.OnFocusChangeListener, DatePickerDialog
         int year = mCalendar.get(Calendar.YEAR);
         int month = mCalendar.get(Calendar.MONTH);
         int day = mCalendar.get(Calendar.DAY_OF_MONTH);
-        new DatePickerDialog(view.getContext(),this, year, month, day).show();
+        new DatePickerDialog(view.getContext(), R.style.DialogTheme,this, year, month, day).show();
 
     }
 

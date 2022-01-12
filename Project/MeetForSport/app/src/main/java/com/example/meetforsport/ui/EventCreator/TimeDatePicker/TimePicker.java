@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.example.meetforsport.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -55,7 +57,7 @@ public class TimePicker implements  View.OnFocusChangeListener,  View.OnClickLis
         }
         int hour = mCalendar.get(Calendar.HOUR);
         int minute = mCalendar.get(Calendar.MINUTE);
-        new TimePickerDialog(view.getContext(), this, hour, minute, true).show();
+        new TimePickerDialog(view.getContext(), R.style.DialogTheme,this, hour, minute, true).show();
     }
 
 }
