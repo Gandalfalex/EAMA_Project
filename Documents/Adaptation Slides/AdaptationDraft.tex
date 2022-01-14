@@ -97,14 +97,14 @@ Targeting mostly active persons, this small social network will allow users  to 
 	\frametitle{Situation 1: Context Model}
 	 \begin{figure}
 		\centering
-		\includegraphics[width=0.7\textwidth]{media/contextmodel1.jpg}
+		\includegraphics[width=0.99\textwidth]{media/contextmodel1.jpg}
 	\end{figure}
 \end{frame}
 
 \begin{frame}   
 	\frametitle{Situation 1: MAPE-K}
 	\begin{itemize}
-		\item Monitor: Network state, Package loss, Bandwidth
+		\item Monitor: Network state, Packet loss, Bandwidth (via ConnectivityManager and WifiManager)
 		\item Analyze: 
 			 \begin{itemize} 
 				\item Case 1: No connection
@@ -112,13 +112,13 @@ Targeting mostly active persons, this small social network will allow users  to 
 			\end{itemize}
 		\item Plan:
 			\begin{itemize}
-				\item Case 1: use cached data 
+				\item Case 1: use cached data and avoid location tracking
 				\item Case 2:  update data
 			\end{itemize}
 		\item Execute:
 			\begin{itemize}
-				\item Case 1: load cached data, ignore online messages
-    				\item Case 2: send requests for updates, fetch only web data 
+				\item Case 1: load cached data, ignore online messages, activate location tracking only if unavoidable
+    				\item Case 2: send requests for updates, fetch only web data, track location if beneficial for user experience 
 			\end{itemize}
 		\item Knowledge: Store behavior model in Android Preferences
 	\end{itemize}
@@ -136,7 +136,7 @@ Targeting mostly active persons, this small social network will allow users  to 
 			\item Persona: Martina Rina, Car Mechanic
 			\item Scenario: Low battery status
 		\end{itemize}
-		 \column{0.45\linewidth}   
+		 \column{0.425\linewidth}   
 		 \begin{figure}
 			\centering
 			\includegraphics[width=1\textwidth]{media/storyboard2.jpg}
@@ -148,19 +148,19 @@ Targeting mostly active persons, this small social network will allow users  to 
 	\frametitle{Situation 2: Context Model}
 	 \begin{figure}
 		\centering
-		\includegraphics[width=0.7\textwidth]{media/contextmodel2.jpg}
+		\includegraphics[width=0.99\textwidth]{media/contextmodel2.jpg}
 	\end{figure}
 \end{frame}
 
 \begin{frame}   
-	\frametitle{Situation 1: MAPE-K}
+	\frametitle{Situation 2: MAPE-K}
 	\begin{itemize}
-		\item Monitor: Batterie state, cpu usage while using it
+		\item Monitor: Batterie state (via BatteryManager)
 		\item Analyze: 
 			 \begin{itemize} 
 				\item Case 1: batterie state $<$ LOW \&\& batterie state $>$ CRITICAL
 				\item Case 1: batterie state $<$ LOW \&\& batterie state $<$ CRITICAL
-				\item Case 1: batterie state $>$ LOW \&\& batterie state $<$ CRITICAL
+				\item Case 1: batterie state $>$ LOW \&\& batterie state $>$ CRITICAL
 			\end{itemize}
 		\item Plan:
 			\begin{itemize}
