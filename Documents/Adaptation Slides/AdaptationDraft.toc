@@ -5,10 +5,8 @@
 \defcounter {refsection}{0}\relax 
 \beamer@sectionintoc {2}{Problematic Situations}{5}{0}{2}
 \defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {3}{Context Features}{8}{0}{3}
+\beamer@sectionintoc {3}{Situation 1: Offline Challenge}{8}{0}{3}
 \defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {4}{Adaptation Mechanisms}{10}{0}{4}
+\beamer@sectionintoc {4}{Situation 2: Energy Challenge}{13}{0}{4}
 \defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {5}{MAPE-K}{12}{0}{5}
-\defcounter {refsection}{0}\relax 
-\beamer@sectionintoc {6}{Detailed Architecture and Technology Choice}{14}{0}{6}
+\beamer@sectionintoc {5}{Detailed Architecture and Technology Choice}{18}{0}{5}
