@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class EventViewModel extends ViewModel {
+public class EventFragmentViewModel extends ViewModel {
 
     private Integer minNumOfParticipants;
     private Integer maxNumOfParticipants;
@@ -12,7 +12,7 @@ public class EventViewModel extends ViewModel {
     private int selectedSearchRadius;
     private boolean[] selectedSports;
 
-    public EventViewModel() {
+    public EventFragmentViewModel() {
         minNumOfParticipants = null;
         maxNumOfParticipants = null;
     }

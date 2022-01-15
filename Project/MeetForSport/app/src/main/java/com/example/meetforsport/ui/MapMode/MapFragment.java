@@ -106,7 +106,6 @@ public class MapFragment extends Fragment implements
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.e("LocationCallback","New Location arrived Bro");
                 if (locationResult == null) {
                     return;
                 }

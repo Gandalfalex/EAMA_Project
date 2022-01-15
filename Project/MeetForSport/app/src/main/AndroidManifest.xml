@@ -13,26 +13,35 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.MeetForSport">
+        android:theme="@style/Theme.MeetForSport"
+        android:usesCleartextTraffic="true">
+
         <uses-library
             android:name="com.google.android.maps"
             android:required="true" />
+
         <activity
             android:name=".ui.EventCreator.EventCreator"
             android:exported="false" />
         <activity
+            android:name=".ui.EventInformation.EventInformationActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyA9cfdcC3J7wYnKGPl4e_DaD_a-y_fUPLw"/>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyA9cfdcC3J7wYnKGPl4e_DaD_a-y_fUPLw" />
     </application>
 
 </manifest>

@@ -54,6 +54,7 @@
         <entry key="app/src/main/res/layout/activity_event_creator.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/activity_find_position.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.18333333333333332" />
+        <entry key="app/src/main/res/layout/content_event_information_acitivity.xml" value="0.1875" />
         <entry key="app/src/main/res/layout/dialog_recycler.xml" value="0.18333333333333332" />
         <entry key="app/src/main/res/layout/event_recyclerview_information_holder.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/fragment_event.xml" value="0.12" />
