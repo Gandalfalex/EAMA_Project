@@ -36,6 +36,7 @@
         <entry key="app/src/main/res/drawable/ic_add_white.xml" value="0.3614583333333333" />
         <entry key="app/src/main/res/drawable/ic_add_white_24dp.xml" value="0.19947916666666668" />
         <entry key="app/src/main/res/drawable/ic_arrow_drop_down.xml" value="0.287962962962963" />
+        <entry key="app/src/main/res/drawable/ic_baseline_access_time.xml" value="0.3558974358974359" />
         <entry key="app/src/main/res/drawable/ic_baseline_format_list_bulleted.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_baseline_gps_fixed.xml" value="0.1875" />
         <entry key="app/src/main/res/drawable/ic_baseline_map.xml" value="0.1875" />
@@ -52,8 +53,10 @@
         <entry key="app/src/main/res/drawable/round_button.xml" value="0.3296296296296296" />
         <entry key="app/src/main/res/drawable/textlines.xml" value="0.32314814814814813" />
         <entry key="app/src/main/res/layout/activity_event_creator.xml" value="0.190625" />
+        <entry key="app/src/main/res/layout/activity_event_information.xml" value="0.18385416666666668" />
         <entry key="app/src/main/res/layout/activity_find_position.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.18333333333333332" />
+        <entry key="app/src/main/res/layout/content_event_information_acitivity.xml" value="0.1875" />
         <entry key="app/src/main/res/layout/dialog_recycler.xml" value="0.18333333333333332" />
         <entry key="app/src/main/res/layout/event_recyclerview_information_holder.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/fragment_event.xml" value="0.12" />

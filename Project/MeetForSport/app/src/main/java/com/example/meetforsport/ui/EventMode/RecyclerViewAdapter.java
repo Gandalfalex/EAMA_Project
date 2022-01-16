@@ -1,6 +1,9 @@
 package com.example.meetforsport.ui.EventMode;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meetforsport.R;
+import com.example.meetforsport.ui.EventInformation.EventInformationActivity;
 
 import java.util.List;
 
@@ -19,10 +23,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private List<Pair<String,String>> information;
     private Context context;
+    private Activity activity;
 
-    public RecyclerViewAdapter(Context context, List<Pair<String,String>> eventInformation){
+    public RecyclerViewAdapter(Context context, Activity activity, List<Pair<String,String>> eventInformation){
         information = eventInformation;
         this.context = context;
+        this.activity = activity;
     }
 
     @NonNull
@@ -34,9 +40,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.event_sport.setText(information.get(position).first);
         holder.event_time.setText(information.get(position).second);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // call activity.
+                Intent intent = new Intent(activity, EventInformationActivity.class);
+                // For passing values
+                intent.putExtra("lol",position+"");
+                activity.startActivity(intent);
+            }
+        });
     }
 
     @Override

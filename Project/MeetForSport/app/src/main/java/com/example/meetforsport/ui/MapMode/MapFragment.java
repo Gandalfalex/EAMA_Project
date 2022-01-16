@@ -11,6 +11,7 @@ import android.location.Location;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.text.Editable;
@@ -47,9 +48,16 @@ import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
 import com.example.meetforsport.ui.EventCreator.EventCreator;
 
 import com.example.meetforsport.ui.ServerCommunication.GetRequestCreator;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -79,10 +87,17 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class MapFragment extends Fragment implements View.OnClickListener, OnMapReadyCallback {
+public class MapFragment extends Fragment implements
+        View.OnClickListener,
+        OnMapReadyCallback,
+        LocationSource {
 
     public static final int REQUEST_LOCATION_CODE = 101;
+    public static final int STANDARD_LOCATION_UPDATE_INTERVAL_IN_SECONDS = 30;
+    public static final int SECONDS_TO_MILLISECONDS = 1000;
+    public static final int LOCATION_REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
 
+    private boolean requestingLocationUpdates = false;
     private MapViewModel mapViewModel;
     private FragmentMapBinding binding;
     private GoogleMap googleMap;
@@ -91,10 +106,18 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     private FusedLocationProviderClient fusedLocationClient;
     private TextView noPermissionTV;
     private Button sportSelectionBtn;
+
     private ArrayList<DataHolder> events;
     private ArrayList<DataHolder> locations;
 
 
+
+    private static final LocationRequest locationRequest = LocationRequest.create()
+            .setPriority(LOCATION_REQUEST_PRIORITY)
+            .setInterval(STANDARD_LOCATION_UPDATE_INTERVAL_IN_SECONDS * SECONDS_TO_MILLISECONDS)
+            .setFastestInterval(STANDARD_LOCATION_UPDATE_INTERVAL_IN_SECONDS * SECONDS_TO_MILLISECONDS);
+    private LocationCallback locationCallback;
+    private OnLocationChangedListener mMapLocationListener = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -108,8 +131,25 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         Context ctx = getContext();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(ctx);
 
+        //create callback for location updates
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        if (mMapLocationListener != null) {
+                            mMapLocationListener.onLocationChanged(location);
+                        }
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                    }
+                }
+            }
+        };
+
         binding = FragmentMapBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
 
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -123,61 +163,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         button.setOnClickListener(this);
         noPermissionTV = v.findViewById(R.id.no_permission_tv);
 
-        //connect min max editText for participants to viewModel
-        EditText numOfParticipantsMinET = (EditText) v.findViewById(R.id.num_of_participants_min_et);
-        numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String eString = editable.toString();
-                if (eString.length() > 3) {
-                    //prevent numbers higher than 999
-                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
-                } else if (eString.length() > 0) {
-                    Integer newMin = Integer.parseInt(eString);
-                    //prevent leading zeros
-                    if (newMin == 0) {
-                        newMin = null;
-                        editable.replace(0, eString.length(), "");
-                    }
-                    mapViewModel.setMinNumOfParticipants(newMin);
-                } else {
-                    mapViewModel.setMinNumOfParticipants(null);
-                }
-            }
-        });
-
-        ((EditText) v.findViewById(R.id.num_of_participants_max_et)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String eString = editable.toString();
-                if (eString.length() > 3) {
-                    //prevent numbers higher than 999
-                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
-                } else if (eString.length() > 0) {
-                    Integer newMax = Integer.parseInt(eString);
-                    //prevent leading zeros
-                    if (newMax == 0) {
-                        newMax = null;
-                        editable.replace(0, eString.length(), "");
-                    }
-                    mapViewModel.setMaxNumOfParticipants(newMax);
-                } else {
-                    mapViewModel.setMaxNumOfParticipants(null);
-                }
-            }
-        });
+        setUpMinMaxEditTexts(v);
 
         //connect search radius slider to textview
         TextView searchRadiusTV = v.findViewById(R.id.search_radius_tv);
@@ -200,25 +186,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         return v;
     }
 
-    @SuppressLint("MissingPermission")
-    private void updateLocation() {
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
-                        }
-                    }
-                });
-    }
-
     @Override
-    public void onSaveInstanceState(Bundle bundle){
+    public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
 
         Bundle mapBundle = bundle.getBundle(MAP_KEY);
-        if (mapBundle == null){
+        if (mapBundle == null) {
             mapBundle = new Bundle();
             bundle.putBundle(MAP_KEY, mapBundle);
         }
@@ -230,8 +203,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         if (requestCode == REQUEST_LOCATION_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                requestingLocationUpdates = true;
                 googleMap.setMyLocationEnabled(true);
-                updateLocation();
+                startLocationUpdates();
                 noPermissionTV.setVisibility(View.INVISIBLE);
             } else {
                 noPermissionTV.setVisibility(View.VISIBLE);
@@ -246,10 +220,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     }
 
     @Override
-    public void onClick(View v){
-        switch (v.getId()){
+    public void onClick(View v) {
+        switch (v.getId()) {
             case R.id.fab_newEvent_MapMode:
-                Intent intent = new Intent(getActivity() , EventCreator.class);
+                Intent intent = new Intent(getActivity(), EventCreator.class);
                 startActivity(intent);
                 break;
             case R.id.filters_btn:
@@ -281,7 +255,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                 ListView list = ((AlertDialog) dialog).getListView();
                 boolean[] selectedSports = mapViewModel.getSelectedSports();
                 int numberOfItems = selectedSports.length;
-                if (which==0) {
+                if (which == 0) {
                     //set all others to true when "select all" is checked
                     if (isChecked) {
                         for (int i = 0; i < list.getCount(); i++) {
@@ -295,7 +269,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                             selectedSports[i] = false;
                         }
                     }
-                } else if (which>0) {
+                } else if (which > 0) {
                     selectedSports[which] = isChecked;
                     //set "select all" to false if any item is unchecked
                     if (!isChecked) {
@@ -303,7 +277,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                         selectedSports[0] = false;
                     }
                     //set "select alL" to true if all items are checked
-                    if (!selectedSports[0] && list.getCheckedItemCount()==(numberOfItems-1)) {
+                    if (!selectedSports[0] && list.getCheckedItemCount() == (numberOfItems - 1)) {
                         list.setItemChecked(0, true);
                         selectedSports[0] = true;
                     }
@@ -312,7 +286,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                 if (list.getCheckedItemCount() == numberOfItems) {
                     sportSelectionBtn.setText(getResources().getString(R.string.all_selected));
                 } else {
-                    sportSelectionBtn.setText(getResources().getString(R.string.number_selected,list.getCheckedItemCount()));
+                    sportSelectionBtn.setText(getResources().getString(R.string.number_selected, list.getCheckedItemCount()));
                 }
                 mapViewModel.setSelectedSports(selectedSports);
             }
@@ -323,6 +297,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         dialog.show();
     }
 
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        if (requestingLocationUpdates) {
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper());
+        }
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback);
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
@@ -330,8 +317,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_CODE);
         }
         else {
+            requestingLocationUpdates = true;
             googleMap.setMyLocationEnabled(true);
-            updateLocation();
             if (locations != null && events != null){
                 for (DataHolder loc : locations){
                     LocationHolder location = (LocationHolder) loc;
@@ -348,6 +335,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
                     }
                 }
             }
+
+            googleMap.setLocationSource(this);
+            startLocationUpdates();
+
         }
     }
 
@@ -355,6 +346,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     public void onResume(){
         super.onResume();
         mapView.onResume();
+        startLocationUpdates();
+
     }
 
     @Override
@@ -366,6 +359,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
     public void onPause(){
         super.onPause();
         mapView.onPause();
+        stopLocationUpdates();
     }
     @Override
     public void onDestroy(){
@@ -378,6 +372,87 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
         mapView.onLowMemory();
     }
 
+    /**
+     * This function connects the min max participant editTexts to the viewModel. It also adds
+     * some logic that stops leading zeros and numbers greater than 999 as an input.
+     * @param v the main view
+     */
+    private void setUpMinMaxEditTexts(View v) {
+
+        EditText numOfParticipantsMinET = (EditText) v.findViewById(R.id.num_of_participants_min_et);
+        numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+
+
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String eString = editable.toString();
+                if (eString.length() > 3) {
+                    //prevent numbers higher than 999
+                    editable.replace(0, eString.length(), eString, 0, eString.length() - 1);
+                } else if (eString.length() > 0) {
+                    Integer newMin = Integer.parseInt(eString);
+                    //prevent leading zeros
+                    if (newMin == 0) {
+                        newMin = null;
+                        editable.replace(0, eString.length(), "");
+                    }
+                    mapViewModel.setMinNumOfParticipants(newMin);
+                } else {
+                    mapViewModel.setMinNumOfParticipants(null);
+                }
+            }
+        });
+
+        ((EditText) v.findViewById(R.id.num_of_participants_max_et)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String eString = editable.toString();
+                if (eString.length() > 3) {
+                    //prevent numbers higher than 999
+                    editable.replace(0, eString.length(), eString, 0, eString.length() - 1);
+                } else if (eString.length() > 0) {
+                    Integer newMax = Integer.parseInt(eString);
+                    //prevent leading zeros
+                    if (newMax == 0) {
+                        newMax = null;
+                        editable.replace(0, eString.length(), "");
+                    }
+                    mapViewModel.setMaxNumOfParticipants(newMax);
+                } else {
+                    mapViewModel.setMaxNumOfParticipants(null);
+                }
+            }
+
+        });
+
+    }
+
+    @Override
+    public void activate(@NonNull OnLocationChangedListener onLocationChangedListener) {
+        mMapLocationListener = onLocationChangedListener;
+    }
+
+    @Override
+    public void deactivate() {
+        mMapLocationListener = null;
+    }
 
 
     public JsonObjectRequest createJsonRequest(Context context, String site){
@@ -418,8 +493,4 @@ public class MapFragment extends Fragment implements View.OnClickListener, OnMap
 
         return  jsonObjectRequest;
     }
-
-
-
-
 }
