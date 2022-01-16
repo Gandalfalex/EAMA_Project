@@ -1,13 +1,18 @@
 package com.example.meetforsport.ui.EventInformation;
 
+import android.location.Location;
+
 import androidx.lifecycle.ViewModel;
 
 public class EventViewModel extends ViewModel  {
 
     private String sportName;
     private int participantBound;
-    private int participants;
-    private String dateAndTime;
+    private int numberOfParticipants;
+    private String date;
+    private String time;
+    private String description;
+    private Location location;
 
     public EventViewModel() {
 
@@ -29,19 +34,43 @@ public class EventViewModel extends ViewModel  {
         this.participantBound = participantBound;
     }
 
-    public int getParticipants() {
-        return participants;
+    public int getNumberOfParticipants() {
+        return numberOfParticipants;
     }
 
-    public void setParticipants(int participants) {
-        this.participants = participants;
+    public void setNumberOfParticipants(int numberOfParticipants) {
+        this.numberOfParticipants = numberOfParticipants;
     }
 
-    public String getDateAndTime() {
-        return dateAndTime;
+    public String getDate() {
+        return date;
     }
 
-    public void setDateAndTime(String dateAndTime) {
-        this.dateAndTime = dateAndTime;
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
