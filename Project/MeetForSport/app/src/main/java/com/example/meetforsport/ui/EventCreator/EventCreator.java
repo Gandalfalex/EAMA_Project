@@ -69,7 +69,7 @@ public class EventCreator extends AppCompatActivity{
         });
         findViewById(R.id.submit_value).setOnClickListener(view -> {
             try {
-                postEventData();
+                if (postEventData()) finish();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -200,6 +200,7 @@ public class EventCreator extends AppCompatActivity{
     
 
     public JsonObjectRequest createJsonRequest(Context context, String site){
+        ArrayList<String> stringss = new ArrayList<>();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, "http://192.168.178.29:8000/" + site, null, new Response.Listener<JSONObject>() {
 
@@ -209,8 +210,8 @@ public class EventCreator extends AppCompatActivity{
                         for (Iterator<String> id = response.keys(); id.hasNext(); ) {
                             String id_key = id.next();
                             try {
-                                if (site.equals("maps"))        data.add(buildLocationHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
-                                else if (site.equals("sports")) data.add(buildSportsHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
+                                if (site.equals("maps"))        data.add(GetRequestCreator.buildLocationHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
+                                else if (site.equals("sports")) data.add(GetRequestCreator.buildSportsHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -230,51 +231,6 @@ public class EventCreator extends AppCompatActivity{
                     }
                 });
         return  jsonObjectRequest;
-    }
-
-
-
-
-
-
-
-
-    /***
-     * TODO find a way to make it more stable
-     * @param object
-     * @param id
-     * @return
-     * @throws JSONException
-     */
-    public LocationHolder buildLocationHolder(JSONObject object, int id) throws JSONException {
-        LocationHolder locationHolder = null;
-        for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
-            String key = id_keys.next();
-            if (key.equals("l_name"))       locationHolder = new LocationHolder(id, object.getString(key));
-            if (key.equals("l_address"))    locationHolder.setL_address(object.getString(key));
-            if (key.equals("long"))         locationHolder.setLongitute(object.getInt(key));
-            if (key.equals("lat"))          locationHolder.setLatitute(object.getInt(key));
-        }
-        return locationHolder;
-    }
-
-    /***
-     * TODO find a way to make it more stable
-     * @param object
-     * @param id
-     * @return
-     * @throws JSONException
-     */
-    public SportHolder buildSportsHolder(JSONObject object, int id) throws JSONException {
-        SportHolder sportHolder = null;
-        for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
-            String key = id_keys.next();
-            if (key.equals("s_name"))       sportHolder = new SportHolder(id, object.getString(key));
-            if (key.equals("min_players"))  sportHolder.setMinPlayer(object.getInt(key));
-            if (key.equals("max_players"))  sportHolder.setMaxPlayer(object.getInt(key));
-
-        }
-        return sportHolder;
     }
 
 }

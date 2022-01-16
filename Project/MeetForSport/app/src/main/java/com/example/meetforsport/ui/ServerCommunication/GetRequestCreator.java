@@ -1,14 +1,22 @@
 package com.example.meetforsport.ui.ServerCommunication;
 
 import android.content.Context;
+import android.util.Log;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.SportHolder;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Iterator;
 
 public class GetRequestCreator {
 
@@ -62,6 +70,62 @@ public class GetRequestCreator {
             }
         });
         instance.addToRequestQueue(jsonObjectRequest);
+    }
+
+
+    /***
+     * TODO find a way to make it more stable
+     * @param object
+     * @param id
+     * @return
+     * @throws JSONException
+     */
+    public static LocationHolder buildLocationHolder(JSONObject object, int id) throws JSONException {
+        LocationHolder locationHolder = null;
+        for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
+            String key = id_keys.next();
+            if (key.equals("l_name"))       locationHolder = new LocationHolder(id, object.getString(key));
+            if (key.equals("l_address"))    locationHolder.setL_address(object.getString(key));
+            if (key.equals("long"))         locationHolder.setLongitute(object.getString(key));
+            if (key.equals("lat"))          locationHolder.setLatitute(object.getString(key));
+        }
+        return locationHolder;
+    }
+
+
+    public static EventHolder buildEventHolder(JSONObject object, int id) throws JSONException {
+        EventHolder eventHolder = null;
+        for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
+            Log.d("HEllO=", object.toString());
+            String key = id_keys.next();
+            if (key.equals("user_id"))      eventHolder = new EventHolder(id, object.getString(key));
+            if (key.equals("time"))         eventHolder.setTime(object.getString(key));
+            if (key.equals("date"))         eventHolder.setDate(object.getString(key));
+            if (key.equals("description"))  eventHolder.setDescription(object.getString(key));
+            if (key.equals("s_id"))         eventHolder.setS_id(object.getInt(key));
+            if (key.equals("l_id"))         eventHolder.setL_id(object.getInt(key));
+        }
+        return eventHolder;
+    }
+
+
+    /***
+     * TODO find a way to make it more stable
+     * @param object
+     * @param id
+     * @return
+     * @throws JSONException
+     */
+    public static SportHolder buildSportsHolder(JSONObject object, int id) throws JSONException {
+        SportHolder sportHolder = null;
+        for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
+            String key = id_keys.next();
+            if (key.equals("s_name"))       sportHolder = new SportHolder(id, object.getString(key));
+            if (key.equals("min_players"))  sportHolder.setMinPlayer(object.getInt(key));
+            if (key.equals("max_players"))  sportHolder.setMaxPlayer(object.getInt(key));
+
+        }
+        return sportHolder;
     }
 
 }
