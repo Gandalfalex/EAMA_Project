@@ -32,6 +32,7 @@ public class EventInformationActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_information);
         Intent intent = getIntent();
+
         Log.e("lol",intent.getStringExtra("lol"));
 
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
@@ -44,8 +45,11 @@ public class EventInformationActivity extends AppCompatActivity implements
         Location dummyLocation = new Location("");
         dummyLocation.setLatitude(53.59777525723245);
         dummyLocation.setLongitude(6.677760110230607);
-        eventViewModel.setLocation(dummyLocation);
 
+        fillInformation(intent.getExtras());
+
+        eventViewModel.setLocation(dummyLocation);
+        fillInformation(intent.getExtras());
         Bundle mapViewBundle = (savedInstanceState != null) ? savedInstanceState.getBundle(MAP_KEY) : null;
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
@@ -103,5 +107,18 @@ public class EventInformationActivity extends AppCompatActivity implements
     public void onLowMemory(){
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+
+    private void fillInformation(Bundle bundle){
+        if (bundle.size() > 1) {
+            eventViewModel.setDate(bundle.getString("date"));
+            eventViewModel.setTime(bundle.getString("time"));
+            eventViewModel.setDescription(bundle.getString("description"));
+            Location l = new Location("");
+            l.setLatitude((float) bundle.get("lat"));
+            l.setLongitude((float) bundle.get("long"));
+            eventViewModel.setLocation(l);
+        }
     }
 }

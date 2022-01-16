@@ -9,11 +9,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -24,16 +21,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.android.volley.Request;
@@ -47,6 +41,7 @@ import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
 import com.example.meetforsport.ui.EventCreator.EventCreator;
 
+import com.example.meetforsport.ui.EventInformation.EventInformationActivity;
 import com.example.meetforsport.ui.ServerCommunication.GetRequestCreator;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -64,18 +59,12 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.slider.Slider;
 
 import org.json.JSONArray;
@@ -84,7 +73,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 
 public class MapFragment extends Fragment implements
@@ -325,12 +313,19 @@ public class MapFragment extends Fragment implements
                     for (DataHolder even : events){
                         EventHolder event = (EventHolder) even;
                         if (location.getId() == event.getL_id()){
-                            Log.d("Event",event.getDescription());
-                            Log.d("Event", String.valueOf(location.getLatitute()));
-                            Log.d("Event",String.valueOf(location.getLongitute()));
                             googleMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(location.getLatitute(), location.getLongitute()))
                                     .title(event.getDescription()));
+                            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                @Override
+                                public boolean onMarkerClick(@NonNull Marker marker) {
+                                    Intent intent = new Intent(getActivity(), EventInformationActivity.class);
+                                    intent.putExtra("lol",1+"");
+                                    intent.putExtras(bundleBuilder(event, location));
+                                    startActivity(intent);
+                                    return true;
+                                }
+                            });
                         }
                     }
                 }
@@ -340,6 +335,20 @@ public class MapFragment extends Fragment implements
             startLocationUpdates();
 
         }
+    }
+
+    private Bundle bundleBuilder(EventHolder event, LocationHolder locationHolder){
+        Bundle bundle = new Bundle();
+       // bundle.putString("lol", "1");
+        bundle.putInt("id", event.getId());
+        bundle.putInt("u_id", event.getU_id());
+        bundle.putInt("l_id", event.getL_id());
+        bundle.putString("description", event.getDescription());
+        bundle.putString("time", event.getTime());
+        bundle.putString("date", event.getDate());
+        bundle.putFloat("lat", locationHolder.getLatitute());
+        bundle.putFloat("long", locationHolder.getLongitute());
+        return bundle;
     }
 
     @Override
