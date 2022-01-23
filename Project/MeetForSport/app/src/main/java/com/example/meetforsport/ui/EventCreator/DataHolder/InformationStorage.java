@@ -1,7 +1,9 @@
 package com.example.meetforsport.ui.EventCreator.DataHolder;
 
+import static android.content.Context.BATTERY_SERVICE;
+
 import android.content.Context;
-import android.provider.ContactsContract;
+import android.os.BatteryManager;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -9,23 +11,30 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.ui.ServerCommunication.GetRequestCreator;
-import com.google.android.gms.common.util.ArrayUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 public class InformationStorage {
 
     private ArrayList<EventHolder> events;
     private ArrayList<LocationHolder> locations;
     private ArrayList<SportHolder> sports;
-    private ArrayList<DataHolder> tempData;
     private static InformationStorage instance;
+    private LocalDateTime eventUpdate;
+    private LocalDateTime locationUpdate;
+    private LocalDateTime sportsUpdate;
+
+    private int BATTERY_LOW = 15;
+    private int BATTERY_CRITICAL = 5;
+
+    private int updateInterval_normal = 2;
+    private int updateInterval_critical = 12;
 
 
     public static synchronized InformationStorage getInstance() {
@@ -36,83 +45,39 @@ public class InformationStorage {
     }
 
 
-
-
     public ArrayList<EventHolder> getEvents(Context context) {
-        if (events == null) {
+        if (events == null || checkForUpdateConditions(eventUpdate, context)) {
+            events = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("events"));
-            if (!tempData.isEmpty()){
-                for (DataHolder data: tempData){
-                    try{
-                        events.add((EventHolder) data);
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            tempData.clear();
+            eventUpdate = LocalDateTime.now();
         }
         return events;
     }
 
-    public void setEvents(ArrayList<EventHolder> events) {
-        this.events = events;
-    }
 
     public ArrayList<LocationHolder> getLocations(Context context) {
-        if (locations == null) {
-           GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("maps"));
-            if (!tempData.isEmpty()){
-                for (DataHolder data: tempData){
-                    try{
-                        locations.add((LocationHolder) data);
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            tempData.clear();
+        if (locations == null  || checkForUpdateConditions(locationUpdate, context) ) {
+            locations = new ArrayList<>();
+            GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("maps"));
+            locationUpdate = LocalDateTime.now();
         }
+
         return locations;
     }
 
-    public void setLocations(ArrayList<LocationHolder> locations) {
-        this.locations = locations;
-    }
 
     public ArrayList<SportHolder> getSports(Context context) {
-        if (sports == null) {
+        if (sports == null || checkForUpdateConditions(sportsUpdate, context)) {
+            sports = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("sports"));
-            if (!tempData.isEmpty()){
-                for (DataHolder data: tempData){
-                    try{
-                        sports.add((SportHolder) data);
-                    }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            tempData.clear();
+            sportsUpdate = LocalDateTime.now();
         }
         return sports;
     }
 
-    public void setSports(ArrayList<SportHolder> sports) {
-        this.sports = sports;
-    }
-
-
-
-
-
-
 
 
     public JsonObjectRequest createJsonRequest(String site){
-        ArrayList<DataHolder> data = new ArrayList<>();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (Request.Method.GET, "http://192.168.178.29:8000/" + site, null, new Response.Listener<JSONObject>() {
                     @Override
@@ -127,17 +92,16 @@ public class InformationStorage {
                                         for (Iterator<String> event_id = event.keys(); event_id.hasNext(); ) {
                                             String event_id_key = event_id.next();
                                             EventHolder temp = buildEventHolder(event.getJSONObject(event_id_key), Integer.valueOf(event_id_key));
-                                            data.add(temp);
+                                            events.add(temp);
                                         }
                                     }
                                 }
-                                else if (site.equals("maps")) data.add(buildLocationHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
-                                else if (site.equals("sports")) data.add(buildSportsHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
+                                else if (site.equals("maps")) locations.add(buildLocationHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
+                                else if (site.equals("sports")) sports.add(buildSportsHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
-                        tempData = data;
                     }
 
                 }, new Response.ErrorListener() {
@@ -176,7 +140,6 @@ public class InformationStorage {
     private static EventHolder buildEventHolder(JSONObject object, int id) throws JSONException {
         EventHolder eventHolder = null;
         for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
-            Log.d("HEllO=", object.toString());
             String key = id_keys.next();
             if (key.equals("user_id"))      eventHolder = new EventHolder(id, object.getString(key));
             if (key.equals("time"))         eventHolder.setTime(object.getString(key));
@@ -207,4 +170,23 @@ public class InformationStorage {
         }
         return sportHolder;
     }
+
+
+    private boolean checkForUpdateConditions(LocalDateTime time, Context context){
+        boolean time_b = time.isAfter(LocalDateTime.now().plusHours(updateInterval_normal));
+
+        BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
+        int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+      
+        if (batLevel > BATTERY_LOW) {
+            return time_b;
+        }
+        else if (batLevel < BATTERY_LOW && batLevel > BATTERY_CRITICAL){
+            return time.isAfter(LocalDateTime.now().plusHours(updateInterval_critical));
+        }
+        else {
+            return false;
+        }
+    }
+
 }

@@ -23,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.R;
 import com.example.meetforsport.ui.EventCreator.DataHolder.DataHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.InformationStorage;
 import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.SportHolder;
 import com.example.meetforsport.ui.EventCreator.TimeDatePicker.DatePicker;
@@ -49,8 +50,8 @@ public class EventCreator extends AppCompatActivity{
     public static TextView address;
     public static TextView sport;
     
-    public static List<DataHolder> map_information;
-    public static List<DataHolder> sport_information;
+    public static List<LocationHolder> map_information;
+    public static List<SportHolder> sport_information;
     
 
     @Override
@@ -87,9 +88,8 @@ public class EventCreator extends AppCompatActivity{
 
 
     private void fetchData(){
-        GetRequestCreator.getInstance(getApplicationContext()).addToRequestQueue(createJsonRequest(getApplicationContext(), "maps"));
-        GetRequestCreator.getInstance(getApplicationContext()).addToRequestQueue(createJsonRequest(getApplicationContext(), "sports"));
-
+        sport_information = InformationStorage.getInstance().getSports(getApplicationContext());
+        map_information = InformationStorage.getInstance().getLocations(getApplicationContext());
     }
 
     /***
@@ -166,8 +166,8 @@ public class EventCreator extends AppCompatActivity{
 
         RecyclerView recyclerView = dialog.findViewById(R.id.recycler_view);
         RecyclerviewAdapter adapterRe;
-        if (version == 1)   adapterRe = new RecyclerviewAdapter(EventCreator.this, sport_information, SPORT);     //find a way to get the data
-        else                adapterRe = new RecyclerviewAdapter(EventCreator.this, map_information, MAP);
+        if (version == 1)   adapterRe = new RecyclerviewAdapter(EventCreator.this,  sport_information, SPORT);     //find a way to get the data
+        else                adapterRe = new RecyclerviewAdapter(EventCreator.this,  map_information, MAP);
 
         recyclerView.setAdapter(adapterRe);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
@@ -195,42 +195,6 @@ public class EventCreator extends AppCompatActivity{
             }
             default: {}
         }
-    }
-
-    
-
-    public JsonObjectRequest createJsonRequest(Context context, String site){
-        ArrayList<String> stringss = new ArrayList<>();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, "http://192.168.178.29:8000/" + site, null, new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        List<DataHolder> data = new ArrayList<>();
-                        for (Iterator<String> id = response.keys(); id.hasNext(); ) {
-                            String id_key = id.next();
-                            try {
-                                if (site.equals("maps"))        data.add(GetRequestCreator.buildLocationHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
-                                else if (site.equals("sports")) data.add(GetRequestCreator.buildSportsHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        if (site.equals("maps"))            map_information = data;
-                        else if (site.equals("sports"))     sport_information = data;
-                        else {
-                            Toast t = Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT);
-                            t.show();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Error", error.toString());
-                    }
-                });
-        return  jsonObjectRequest;
     }
 
 }

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.icu.text.IDNA;
 import android.location.Location;
 
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.example.meetforsport.R;
 import com.example.meetforsport.databinding.FragmentMapBinding;
 import com.example.meetforsport.ui.EventCreator.DataHolder.DataHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.InformationStorage;
 import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
 import com.example.meetforsport.ui.EventCreator.EventCreator;
 
@@ -95,8 +97,8 @@ public class MapFragment extends Fragment implements
     private TextView noPermissionTV;
     private Button sportSelectionBtn;
 
-    private ArrayList<DataHolder> events;
-    private ArrayList<DataHolder> locations;
+    private ArrayList<EventHolder> events;
+    private ArrayList<LocationHolder> locations;
 
 
 
@@ -109,8 +111,8 @@ public class MapFragment extends Fragment implements
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        GetRequestCreator.getInstance(getContext()).addToRequestQueue(createJsonRequest(getContext(), "events"));
-        GetRequestCreator.getInstance(getContext()).addToRequestQueue(createJsonRequest(getContext(), "maps"));
+        events = InformationStorage.getInstance().getEvents(getContext());
+        locations = InformationStorage.getInstance().getLocations(getContext());
 
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         mapViewModel.setSelectedSearchRadius(5);
@@ -463,43 +465,4 @@ public class MapFragment extends Fragment implements
         mMapLocationListener = null;
     }
 
-
-    public JsonObjectRequest createJsonRequest(Context context, String site){
-        ArrayList<DataHolder> data = new ArrayList<>();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, "http://192.168.178.29:8000/" + site, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        for (Iterator<String> id = response.keys(); id.hasNext(); ) {
-                            String id_key = id.next();
-                            try {
-                                if (site.equals("events")){
-                                    JSONArray event_object = response.getJSONArray(id_key);
-                                    for (int i = 0; i < event_object.length(); i++){
-                                        JSONObject event = event_object.getJSONObject(i);
-                                        for (Iterator<String> event_id = event.keys(); event_id.hasNext(); ) {
-                                            String event_id_key = event_id.next();
-                                            EventHolder temp = GetRequestCreator.buildEventHolder(event.getJSONObject(event_id_key), Integer.valueOf(event_id_key));
-                                            data.add(temp);
-                                        }
-                                    }
-                                }
-                                else if (site.equals("maps")) data.add(GetRequestCreator.buildLocationHolder(response.getJSONObject(id_key), Integer.valueOf(id_key)));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        if (site.equals("events")) events = data;
-                        if (site.equals("maps")) locations = data;
-                    }
-
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Error", error.toString());
-                    }
-                });
-
-        return  jsonObjectRequest;
-    }
 }

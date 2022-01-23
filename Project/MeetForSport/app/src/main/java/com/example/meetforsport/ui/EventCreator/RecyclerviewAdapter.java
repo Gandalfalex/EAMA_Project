@@ -22,13 +22,13 @@ import java.util.List;
 public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapter.SViewHolder> {
 
 
-    private List<DataHolder> information;
+    private List<? extends DataHolder> information;
     private Context context;
     private MODE mode;
 
     public static enum MODE {MAP, SPORT};
 
-    public RecyclerviewAdapter(Context context, List<DataHolder> information, MODE mode){
+    public RecyclerviewAdapter(Context context, List<? extends DataHolder> information, MODE mode){
         this.information = information;
         if (information.isEmpty() || information == null){
             information = new ArrayList<>();
