@@ -21,11 +21,11 @@ import java.util.List;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.SViewHolder> {
 
 
-    private List<Pair<String,String>> information;
+    private List<List<String>> information;
     private Context context;
     private Activity activity;
 
-    public RecyclerViewAdapter(Context context, Activity activity, List<Pair<String,String>> eventInformation){
+    public RecyclerViewAdapter(Context context, Activity activity, List<List<String>> eventInformation){
         information = eventInformation;
         this.context = context;
         this.activity = activity;
@@ -41,8 +41,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull SViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        holder.event_sport.setText(information.get(position).first);
-        holder.event_time.setText(information.get(position).second);
+        holder.event_sport.setText(information.get(position).get(0));
+        holder.event_time.setText(information.get(position).get(1));
+        holder.event_date.setText(information.get(position).get(2));
+        holder.event_participants.setText(information.get(position).get(3));
+        holder.event_creator.setText(context.getResources().getString(R.string.created_by,information.get(position).get(4)));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,12 +67,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public class SViewHolder extends RecyclerView.ViewHolder {
 
-        TextView event_sport, event_time;
+        TextView event_sport, event_time, event_date, event_participants, event_creator;
 
         public SViewHolder(@NonNull View itemView) {
             super(itemView);
             event_sport = itemView.findViewById(R.id.my_events_sport);
             event_time = itemView.findViewById(R.id.my_events_time);
+            event_date = itemView.findViewById(R.id.my_events_date);
+            event_creator = itemView.findViewById(R.id.my_events_creator);
+            event_participants = itemView.findViewById(R.id.my_events_participants);
         }
     }
 }

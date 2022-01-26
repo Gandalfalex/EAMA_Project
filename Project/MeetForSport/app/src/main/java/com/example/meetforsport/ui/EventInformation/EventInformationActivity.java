@@ -3,6 +3,7 @@ package com.example.meetforsport.ui.EventInformation;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -36,12 +37,13 @@ public class EventInformationActivity extends AppCompatActivity implements
         Log.e("lol",intent.getStringExtra("lol"));
 
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
-        eventViewModel.setSportName("Sport");
-        eventViewModel.setDate("13.10.1998");
+        eventViewModel.setSportName("Football");
+        eventViewModel.setDate("Feb 10");
         eventViewModel.setTime("04:20 pm");
         eventViewModel.setNumberOfParticipants(7);
         eventViewModel.setParticipantBound(42);
-        eventViewModel.setDescription("Dummy event description...");
+        eventViewModel.setDescription("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
+        eventViewModel.setCreatorName("User11233");
         Location dummyLocation = new Location("");
         dummyLocation.setLatitude(53.59777525723245);
         dummyLocation.setLongitude(6.677760110230607);
@@ -55,12 +57,12 @@ public class EventInformationActivity extends AppCompatActivity implements
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
 
-        ((TextView) findViewById(R.id.dateAndTime_tv)).setText(eventViewModel.getTime()+", "+eventViewModel.getDate());
-        ((TextView) findViewById(R.id.sport_tv)).setText(eventViewModel.getSportName());
-        ((TextView) findViewById(R.id.participants_tv)).setText(eventViewModel.getNumberOfParticipants()+"/"+eventViewModel.getParticipantBound());
+        ((TextView) findViewById(R.id.event_headline_tv)).setText(getResources().getString(R.string.headline_event_and_date, eventViewModel.getSportName(), eventViewModel.getDate()));
         ((TextView) findViewById(R.id.event_description_tv)).setText(eventViewModel.getDescription());
-
-
+        ((TextView) findViewById(R.id.event_info_time_tv)).setText(eventViewModel.getTime());
+        ((TextView) findViewById(R.id.event_info_participants)).setText(getResources().getString(R.string.participant_count, eventViewModel.getNumberOfParticipants(), eventViewModel.getParticipantBound()));
+        ((TextView) findViewById(R.id.event_creator_tv)).setText(getResources().getString(R.string.event_creator, eventViewModel.getCreatorName()));
+        ((TextView) findViewById(R.id.event_description_tv)).setMovementMethod(new ScrollingMovementMethod());
     }
 
     @Override

@@ -31,7 +31,7 @@
     <!-- Sport information -->
     <string name="sport_name">Sport name</string>
     <string name="participants_number"> 13 people</string>
-    <string name="time">time</string>
+    <string name="time">Time</string>
     <string name="date">date</string>
 
     <!-- User Profile -->
@@ -54,6 +54,8 @@
     <string name="number_of_participants">Number Of Participants:</string>
     <string name="min">Min</string>
     <string name="max">Max</string>
+    <string name="created_by">by %1$s</string>
+    <string name="search_results">Search Results:</string>
 
     <string-array name="order_options">
         <item>Smallest Distance</item>
@@ -64,6 +66,13 @@
     <!-- MapMode Fragment -->
     <string name="no_permissions">Give MeetForSports access to your location to get this functionality.</string>
     <string name="title_activity_event_information_acitivity">EventInformationAcitivity</string>
+
+    <!-- Event Information -->
+    <string name="headline_event_and_date">%1$s-Event on %2$s</string>
+    <string name="participants">Participants</string>
+    <string name="participant_count">%1$d/%2$d</string>
+    <string name="join_event">join event</string>
+    <string name="event_creator">Event Creator: %1$s</string>
 
 
 </resources>

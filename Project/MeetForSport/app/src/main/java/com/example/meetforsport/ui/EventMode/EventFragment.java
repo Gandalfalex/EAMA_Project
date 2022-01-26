@@ -38,6 +38,7 @@ import com.google.android.material.slider.Slider;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -167,19 +168,18 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         return  jsonObjectRequest;
     }
 
-    private static List<Pair<String,String>> DummyEvents(){
-
-        List<Pair<String,String>> myList = new ArrayList<>();
-        myList.add(new Pair<>("Football", "16:30, 8.12.21"));
-        myList.add(new Pair<>("Running", "12:00, 14.12.21"));
-        myList.add(new Pair<>("Basketball", "14:00, 24.12.21"));
-        myList.add(new Pair<>("Football", "12:00, 01.01.22"));
-        myList.add(new Pair<>("Football", "18:00, 07.01.22"));
-        myList.add(new Pair<>("Football", "16:30, 8.12.21"));
-        myList.add(new Pair<>("Running", "12:00, 14.12.21"));
-        myList.add(new Pair<>("Basketball", "14:00, 24.12.21"));
-        myList.add(new Pair<>("Football", "12:00, 01.01.22"));
-        myList.add(new Pair<>("Football", "18:00, 07.01.22"));
+    private static List<List<String>> DummyEvents(){
+        List<List<String>> myList = new ArrayList<>();
+        myList.add(Arrays.asList("Football", "16:30", "8.12","(8/10)","User12"));
+        myList.add(Arrays.asList("Running", "12:00", "14.12","(3/4)","User12"));
+        myList.add(Arrays.asList("Basketball", "14:00", "24.12","(6/8)","User12"));
+        myList.add(Arrays.asList("Football", "12:00", "01.01","(14/20)","User12"));
+        myList.add(Arrays.asList("Football", "18:00", "07.01","(12/20)","User12"));
+        myList.add(Arrays.asList("Football", "16:30", "8.12","(5/10)","User12"));
+        myList.add(Arrays.asList("Running", "12:00", "14.12","(1/4)","User12"));
+        myList.add(Arrays.asList("Basketball", "14:00", "24.12","(4/8)","User12"));
+        myList.add(Arrays.asList("Football", "12:00", "01.01","(4/20)","User12"));
+        myList.add(Arrays.asList("Football", "18:00", "07.01","(6/20)","User12"));
 
         return myList;
     }

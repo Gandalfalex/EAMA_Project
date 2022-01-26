@@ -13,9 +13,18 @@ public class EventViewModel extends ViewModel  {
     private String time;
     private String description;
     private Location location;
+    private String CreatorName;
 
     public EventViewModel() {
 
+    }
+
+    public String getCreatorName() {
+        return CreatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        CreatorName = creatorName;
     }
 
     public String getSportName() {
