@@ -141,7 +141,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="33dp"
         android:gravity="center"
-        android:text="@string/sport"
+        android:text="@string/more_information"
         android:textSize="@dimen/activity_sectionHeadline" />
 
 

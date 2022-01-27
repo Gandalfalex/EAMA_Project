@@ -99,12 +99,12 @@ public class UserFragment extends Fragment {
 
     private static List<List<String>> DummyEvents(){
         List<List<String>> myList = new ArrayList<>();
-        myList.add(Arrays.asList("Football", "16:30", "8.12","(8/10)","User12"));
-        myList.add(Arrays.asList("Running", "12:00", "14.12","(3/4)","User12"));
-        myList.add(Arrays.asList("Football", "12:00", "01.01","(14/20)","User12"));
-        myList.add(Arrays.asList("Football", "16:30", "8.12","(5/10)","User12"));
-        myList.add(Arrays.asList("Basketball", "14:00", "24.12","(4/8)","User12"));
-        myList.add(Arrays.asList("Football", "18:00", "07.01","(6/20)","User12"));
+        myList.add(Arrays.asList("Football", "16:30", "8.12","8/10","User12"));
+        myList.add(Arrays.asList("Running", "12:00", "14.12","3/4","User12"));
+        myList.add(Arrays.asList("Football", "12:00", "01.01","14/20","User12"));
+        myList.add(Arrays.asList("Football", "16:30", "8.12","5/10","User12"));
+        myList.add(Arrays.asList("Basketball", "14:00", "24.12","4/8","User12"));
+        myList.add(Arrays.asList("Football", "18:00", "07.01","6/20","User12"));
 
         return myList;
     }

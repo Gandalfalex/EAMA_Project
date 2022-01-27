@@ -18,7 +18,7 @@
 
     <!-- Create new Event Strings -->
     <string name="new_Event">new Event</string>
-    <string name="new_Event_planner_headline">plan your new event</string>
+    <string name="new_Event_planner_headline">New Event</string>
 
     <string name="find_location">find location</string>
     <string name="address">this will be your address</string>
@@ -26,6 +26,7 @@
     <string name="sport">Sport</string>
     <string name="description">Description</string>
     <string name="find_sport">find sport</string>
+    <string name="more_information">More Information:</string>
 
 
     <!-- Sport information -->
