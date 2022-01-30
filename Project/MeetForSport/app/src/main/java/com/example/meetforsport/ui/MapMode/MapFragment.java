@@ -67,14 +67,16 @@ public class MapFragment extends Fragment implements
         LocationSource {
 
     public static final int REQUEST_LOCATION_CODE = 101;
+    private static final String MAP_KEY = "MapViewBundleKey";
 
     private boolean requestingLocationUpdates = false;
     private MapViewModel mapViewModel;
-    private FragmentMapBinding binding;
     private GoogleMap googleMap;
-    private static final String MAP_KEY = "MapViewBundleKey";
     private MapView mapView;
     private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private OnLocationChangedListener mMapLocationListener = null;
+
     private TextView noPermissionTV;
     private Button sportSelectionBtn;
 
@@ -82,68 +84,34 @@ public class MapFragment extends Fragment implements
     private ArrayList<LocationHolder> locations;
 
 
-    private LocationCallback locationCallback;
-    private OnLocationChangedListener mMapLocationListener = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         events = InformationStorage.getInstance().getEvents(getContext());
         locations = InformationStorage.getInstance().getLocations(getContext());
 
+        //set up view model
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         mapViewModel.setSelectedSearchRadius(5);
         mapViewModel.setSelectedSports(new boolean[]{true, true, true, true, true});
 
-        Context ctx = getContext();
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(ctx);
+        //set up location updates
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
+        locationCallback = getLocationCallback();
 
-        //create callback for location updates
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        if (mMapLocationListener != null) {
-                            mMapLocationListener.onLocationChanged(location);
-                        }
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
-                    }
-                }
-            }
-        };
 
-        binding = FragmentMapBinding.inflate(inflater, container, false);
-
+        //set up view
         View v = inflater.inflate(R.layout.fragment_map, container, false);
-
-        //add fragment as click listener for buttons
         sportSelectionBtn = v.findViewById(R.id.sports_selection_btn);
         sportSelectionBtn.setOnClickListener(this);
         v.findViewById(R.id.filters_btn).setOnClickListener(this);
         v.findViewById(R.id.apply_filters_btn).setOnClickListener(this);
-
-        FloatingActionButton button = (FloatingActionButton) v.findViewById(R.id.fab_newEvent_MapMode);
+        FloatingActionButton button = v.findViewById(R.id.fab_newEvent_MapMode);
         button.setOnClickListener(this);
         noPermissionTV = v.findViewById(R.id.no_permission_tv);
-
         setUpMinMaxEditTexts(v);
+        setUpSlider(v);
 
-        //connect search radius slider to textview
-        TextView searchRadiusTV = v.findViewById(R.id.search_radius_tv);
-        searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
-        Slider searchRadiusSlider = v.findViewById(R.id.search_radius_slider);
-        searchRadiusSlider.setValue(mapViewModel.getSelectedSearchRadius());
-        searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                mapViewModel.setSelectedSearchRadius(Math.round(value));
-                searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
-            }
-        });
-
+        //set up map
         Bundle mapViewBundle = (savedInstanceState != null) ? savedInstanceState.getBundle(MAP_KEY) : null;
         mapView = v.findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
@@ -153,7 +121,7 @@ public class MapFragment extends Fragment implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle bundle) {
+    public void onSaveInstanceState(@NonNull Bundle bundle) {
         super.onSaveInstanceState(bundle);
 
         Bundle mapBundle = bundle.getBundle(MAP_KEY);
@@ -182,7 +150,6 @@ public class MapFragment extends Fragment implements
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 
     @Override
@@ -205,68 +172,10 @@ public class MapFragment extends Fragment implements
         }
     }
 
-    /**
-     * Create a dialog with the list of sports to choose from. Multiple Choices are possible.
-     */
-    private void showSportsSelectionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(getResources().getString(R.string.sports));
-
-        //just temporary, will be connected with database in the future
-        String[] sports = {"Select All", "Football", "Basketball", "Volley Ball", "Running"};
-
-        builder.setMultiChoiceItems(sports, mapViewModel.getSelectedSports(), new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                ListView list = ((AlertDialog) dialog).getListView();
-                boolean[] selectedSports = mapViewModel.getSelectedSports();
-                int numberOfItems = selectedSports.length;
-                if (which == 0) {
-                    //set all others to true when "select all" is checked
-                    if (isChecked) {
-                        for (int i = 0; i < list.getCount(); i++) {
-                            list.setItemChecked(i, true);
-                            selectedSports[i] = true;
-                        }
-                        //set all others to false when "select all" is unchecked
-                    } else {
-                        for (int i = 0; i < list.getCount(); i++) {
-                            list.setItemChecked(i, false);
-                            selectedSports[i] = false;
-                        }
-                    }
-                } else if (which > 0) {
-                    selectedSports[which] = isChecked;
-                    //set "select all" to false if any item is unchecked
-                    if (!isChecked) {
-                        list.setItemChecked(0, false);
-                        selectedSports[0] = false;
-                    }
-                    //set "select alL" to true if all items are checked
-                    if (!selectedSports[0] && list.getCheckedItemCount() == (numberOfItems - 1)) {
-                        list.setItemChecked(0, true);
-                        selectedSports[0] = true;
-                    }
-                }
-                //change text on button to say the number of selected sports
-                if (list.getCheckedItemCount() == numberOfItems) {
-                    sportSelectionBtn.setText(getResources().getString(R.string.all_selected));
-                } else {
-                    sportSelectionBtn.setText(getResources().getString(R.string.number_selected, list.getCheckedItemCount()));
-                }
-                mapViewModel.setSelectedSports(selectedSports);
-            }
-        });
-        builder.setPositiveButton("OK", null);
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
     @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
         if (requestingLocationUpdates) {
-            fusedLocationClient.requestLocationUpdates(BatteryOptions.chooseLocationPriority(getContext()),
+            fusedLocationClient.requestLocationUpdates(BatteryOptions.chooseLocationPriority(requireContext()),
                     locationCallback,
                     Looper.getMainLooper());
         }
@@ -276,30 +185,44 @@ public class MapFragment extends Fragment implements
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
+    private LocationCallback getLocationCallback() {
+        return new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                for (Location location : locationResult.getLocations()) {
+                    if (location != null) {
+                        if (mMapLocationListener != null) {
+                            mMapLocationListener.onLocationChanged(location);
+                        }
+                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                    }
+                }
+            }
+        };
+    }
+
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_CODE);
         }
         else {
             requestingLocationUpdates = true;
             googleMap.setMyLocationEnabled(true);
             if (locations != null && events != null){
-                for (DataHolder loc : locations){
-                    LocationHolder location = (LocationHolder) loc;
-                    for (DataHolder even : events){
-                        EventHolder event = (EventHolder) even;
-                        if (location.getId() == event.getL_id()){
+                for (LocationHolder loc : locations){
+                    for (EventHolder even : events){
+                        if (loc.getId() == even.getL_id()){
                             googleMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(location.getLatitute(), location.getLongitute()))
-                                    .title(event.getDescription()));
+                                    .position(new LatLng(loc.getLatitute(), loc.getLongitute()))
+                                    .title(even.getDescription()));
                             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                 @Override
                                 public boolean onMarkerClick(@NonNull Marker marker) {
                                     Intent intent = new Intent(getActivity(), EventInformationActivity.class);
                                     intent.putExtra("lol",1+"");
-                                    intent.putExtras(bundleBuilder(event, location));
+                                    intent.putExtras(bundleBuilder(even, loc));
                                     startActivity(intent);
                                     return true;
                                 }
@@ -357,6 +280,20 @@ public class MapFragment extends Fragment implements
     public void onLowMemory(){
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    private void setUpSlider(View v) {
+        TextView searchRadiusTV = v.findViewById(R.id.search_radius_tv);
+        Slider searchRadiusSlider = v.findViewById(R.id.search_radius_slider);
+        searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
+        searchRadiusSlider.setValue(mapViewModel.getSelectedSearchRadius());
+        searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                mapViewModel.setSelectedSearchRadius(Math.round(value));
+                searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
+            }
+        });
     }
 
     /**
@@ -429,6 +366,64 @@ public class MapFragment extends Fragment implements
 
         });
 
+    }
+
+    /**
+     * Create a dialog with the list of sports to choose from. Multiple Choices are possible.
+     */
+    private void showSportsSelectionDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(getResources().getString(R.string.sports));
+
+        //just temporary, will be connected with database in the future
+        String[] sports = {"Select All", "Football", "Basketball", "Volley Ball", "Running"};
+
+        builder.setMultiChoiceItems(sports, mapViewModel.getSelectedSports(), new DialogInterface.OnMultiChoiceClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                ListView list = ((AlertDialog) dialog).getListView();
+                boolean[] selectedSports = mapViewModel.getSelectedSports();
+                int numberOfItems = selectedSports.length;
+                if (which == 0) {
+                    //set all others to true when "select all" is checked
+                    if (isChecked) {
+                        for (int i = 0; i < list.getCount(); i++) {
+                            list.setItemChecked(i, true);
+                            selectedSports[i] = true;
+                        }
+                        //set all others to false when "select all" is unchecked
+                    } else {
+                        for (int i = 0; i < list.getCount(); i++) {
+                            list.setItemChecked(i, false);
+                            selectedSports[i] = false;
+                        }
+                    }
+                } else if (which > 0) {
+                    selectedSports[which] = isChecked;
+                    //set "select all" to false if any item is unchecked
+                    if (!isChecked) {
+                        list.setItemChecked(0, false);
+                        selectedSports[0] = false;
+                    }
+                    //set "select alL" to true if all items are checked
+                    if (!selectedSports[0] && list.getCheckedItemCount() == (numberOfItems - 1)) {
+                        list.setItemChecked(0, true);
+                        selectedSports[0] = true;
+                    }
+                }
+                //change text on button to say the number of selected sports
+                if (list.getCheckedItemCount() == numberOfItems) {
+                    sportSelectionBtn.setText(getResources().getString(R.string.all_selected));
+                } else {
+                    sportSelectionBtn.setText(getResources().getString(R.string.number_selected, list.getCheckedItemCount()));
+                }
+                mapViewModel.setSelectedSports(selectedSports);
+            }
+        });
+        builder.setPositiveButton("OK", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override

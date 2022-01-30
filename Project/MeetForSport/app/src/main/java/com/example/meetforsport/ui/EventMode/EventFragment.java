@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,93 +49,26 @@ public class EventFragment extends Fragment implements View.OnClickListener {
     private Button sportSelectionBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //set up view model
         eventFragmentViewModel = new ViewModelProvider(this).get(EventFragmentViewModel.class);
-        //fill viewModel
         eventFragmentViewModel.setSelectedSearchRadius(5);
         eventFragmentViewModel.setSelectedOrderOption(1);
         eventFragmentViewModel.setSelectedSports(new boolean[]{true, true, true, true, true});
 
+
+
+        //set up view
         binding = FragmentEventBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        View v = inflater.inflate(R.layout.fragment_event, container,false);
-
-        //add fragment as click listener for buttons
         sportSelectionBtn = root.findViewById(R.id.sports_selection_btn);
         sportSelectionBtn.setOnClickListener(this);
         root.findViewById(R.id.fab_newEvent_EventMode).setOnClickListener(this);
         root.findViewById(R.id.filters_btn).setOnClickListener(this);
         root.findViewById(R.id.apply_filters_btn).setOnClickListener(this);
         root.findViewById(R.id.order_btn).setOnClickListener(this);
+        setUpMinMaxEditText(root);
+        setUpSearchRadiusSlider(root);
 
-        //connect min max editText for participants to viewModel
-        EditText numOfParticipantsMinET = (EditText) root.findViewById(R.id.num_of_participants_min_et);
-        numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String eString = editable.toString();
-                if (eString.length() > 3) {
-                    //prevent numbers higher than 999
-                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
-                } else if (eString.length() > 0) {
-                    Integer newMin = Integer.parseInt(eString);
-                    //prevent leading zeros
-                    if (newMin == 0) {
-                        newMin = null;
-                        editable.replace(0, eString.length(), "");
-                    }
-                    eventFragmentViewModel.setMinNumOfParticipants(newMin);
-                } else {
-                    eventFragmentViewModel.setMinNumOfParticipants(null);
-                }
-            }
-        });
-
-        ((EditText) root.findViewById(R.id.num_of_participants_max_et)).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                String eString = editable.toString();
-                if (eString.length() > 3) {
-                    //prevent numbers higher than 999
-                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
-                } else if (eString.length() > 0) {
-                    Integer newMax = Integer.parseInt(eString);
-                    //prevent leading zeros
-                    if (newMax == 0) {
-                        newMax = null;
-                        editable.replace(0, eString.length(), "");
-                    }
-                    eventFragmentViewModel.setMaxNumOfParticipants(newMax);
-                } else {
-                    eventFragmentViewModel.setMaxNumOfParticipants(null);
-                }
-            }
-        });
-
-        //connect search radius slider to textview
-        TextView searchRadiusTV = root.findViewById(R.id.search_radius_tv);
-        searchRadiusTV.setText(getResources().getString(R.string.search_radius, eventFragmentViewModel.getSelectedSearchRadius()));
-        Slider searchRadiusSlider = root.findViewById(R.id.search_radius_slider);
-        searchRadiusSlider.setValue(eventFragmentViewModel.getSelectedSearchRadius());
-        searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                eventFragmentViewModel.setSelectedSearchRadius(Math.round(value));
-                searchRadiusTV.setText(getResources().getString(R.string.search_radius, eventFragmentViewModel.getSelectedSearchRadius()));
-            }
-        });
 
         //fill recycler view with dummy events
         RecyclerView recyclerView = root.findViewById(R.id.events_recycler_view);
@@ -292,5 +224,75 @@ public class EventFragment extends Fragment implements View.OnClickListener {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void setUpMinMaxEditText(View v) {
+        EditText numOfParticipantsMinET = (EditText) v.findViewById(R.id.num_of_participants_min_et);
+        numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String eString = editable.toString();
+                if (eString.length() > 3) {
+                    //prevent numbers higher than 999
+                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
+                } else if (eString.length() > 0) {
+                    Integer newMin = Integer.parseInt(eString);
+                    //prevent leading zeros
+                    if (newMin == 0) {
+                        newMin = null;
+                        editable.replace(0, eString.length(), "");
+                    }
+                    eventFragmentViewModel.setMinNumOfParticipants(newMin);
+                } else {
+                    eventFragmentViewModel.setMinNumOfParticipants(null);
+                }
+            }
+        });
+        ((EditText) v.findViewById(R.id.num_of_participants_max_et)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String eString = editable.toString();
+                if (eString.length() > 3) {
+                    //prevent numbers higher than 999
+                    editable.replace(0, eString.length(), eString, 0, eString.length()-1);
+                } else if (eString.length() > 0) {
+                    Integer newMax = Integer.parseInt(eString);
+                    //prevent leading zeros
+                    if (newMax == 0) {
+                        newMax = null;
+                        editable.replace(0, eString.length(), "");
+                    }
+                    eventFragmentViewModel.setMaxNumOfParticipants(newMax);
+                } else {
+                    eventFragmentViewModel.setMaxNumOfParticipants(null);
+                }
+            }
+        });
+    }
+
+    private void setUpSearchRadiusSlider(View root) {
+        TextView searchRadiusTV = root.findViewById(R.id.search_radius_tv);
+        searchRadiusTV.setText(getResources().getString(R.string.search_radius, eventFragmentViewModel.getSelectedSearchRadius()));
+        Slider searchRadiusSlider = root.findViewById(R.id.search_radius_slider);
+        searchRadiusSlider.setValue(eventFragmentViewModel.getSelectedSearchRadius());
+        searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                eventFragmentViewModel.setSelectedSearchRadius(Math.round(value));
+                searchRadiusTV.setText(getResources().getString(R.string.search_radius, eventFragmentViewModel.getSelectedSearchRadius()));
+            }
+        });
     }
 }
