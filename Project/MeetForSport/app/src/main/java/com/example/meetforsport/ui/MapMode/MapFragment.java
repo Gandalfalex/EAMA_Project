@@ -2,8 +2,10 @@ package com.example.meetforsport.ui.MapMode;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -30,9 +32,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.meetforsport.R;
-import com.example.meetforsport.databinding.FragmentMapBinding;
 import com.example.meetforsport.ui.Batterymanager.BatteryOptions;
-import com.example.meetforsport.ui.EventCreator.DataHolder.DataHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.InformationStorage;
 import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
@@ -41,7 +41,6 @@ import com.example.meetforsport.ui.EventCreator.EventCreator;
 import com.example.meetforsport.ui.EventInformation.EventInformationActivity;
 
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -76,6 +75,7 @@ public class MapFragment extends Fragment implements
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
     private OnLocationChangedListener mMapLocationListener = null;
+    private BroadcastReceiver batteryBroadcastReceiver;
 
     private TextView noPermissionTV;
     private Button sportSelectionBtn;
@@ -83,6 +83,28 @@ public class MapFragment extends Fragment implements
     private ArrayList<EventHolder> events;
     private ArrayList<LocationHolder> locations;
 
+    /**
+     * BroadcastReceiver that reacts to change of the battery level by issuing a new LocationRequest if needed.
+     * If it receives a battery level update, it uses the BatteryOptions to determine, if the
+     * battery mode has changed and a new LocationRequest has to be issued.
+     */
+    private class BatteryBroadcastReceiver extends BroadcastReceiver {
+        private final static String BATTERY_LEVEL = "level";
+
+        @SuppressLint("MissingPermission")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (BatteryOptions.setBatteryMode(context)) {
+                if (requestingLocationUpdates) {
+                    fusedLocationClient.removeLocationUpdates(locationCallback);
+                    fusedLocationClient.requestLocationUpdates(BatteryOptions.buildRequest(),
+                            locationCallback,
+                            Looper.getMainLooper());
+                }
+            }
+
+        }
+    }
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,6 +120,8 @@ public class MapFragment extends Fragment implements
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         locationCallback = getLocationCallback();
 
+        //set up battery broadcast receiver
+        batteryBroadcastReceiver = new BatteryBroadcastReceiver();
 
         //set up view
         View v = inflater.inflate(R.layout.fragment_map, container, false);
@@ -175,7 +199,8 @@ public class MapFragment extends Fragment implements
     @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
         if (requestingLocationUpdates) {
-            fusedLocationClient.requestLocationUpdates(BatteryOptions.chooseLocationPriority(requireContext()),
+            BatteryOptions.setBatteryMode(requireContext());
+            fusedLocationClient.requestLocationUpdates(BatteryOptions.buildRequest(),
                     locationCallback,
                     Looper.getMainLooper());
         }
@@ -263,8 +288,16 @@ public class MapFragment extends Fragment implements
     @Override
     public void onStart(){
         super.onStart();
+        requireContext().registerReceiver(batteryBroadcastReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         mapView.onStart();
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        requireContext().unregisterReceiver(batteryBroadcastReceiver);
+    }
+
     @Override
     public void onPause(){
         super.onPause();
