@@ -7,14 +7,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.icu.text.IDNA;
 import android.location.Location;
 
 import android.os.Bundle;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +29,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.R;
 import com.example.meetforsport.databinding.FragmentMapBinding;
+import com.example.meetforsport.ui.Batterymanager.BatteryOptions;
 import com.example.meetforsport.ui.EventCreator.DataHolder.DataHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.InformationStorage;
@@ -44,22 +39,15 @@ import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
 import com.example.meetforsport.ui.EventCreator.EventCreator;
 
 import com.example.meetforsport.ui.EventInformation.EventInformationActivity;
-import com.example.meetforsport.ui.ServerCommunication.GetRequestCreator;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -69,12 +57,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.material.slider.Slider;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 
 public class MapFragment extends Fragment implements
@@ -83,9 +67,6 @@ public class MapFragment extends Fragment implements
         LocationSource {
 
     public static final int REQUEST_LOCATION_CODE = 101;
-    public static final int STANDARD_LOCATION_UPDATE_INTERVAL_IN_SECONDS = 30;
-    public static final int SECONDS_TO_MILLISECONDS = 1000;
-    public static final int LOCATION_REQUEST_PRIORITY = LocationRequest.PRIORITY_HIGH_ACCURACY;
 
     private boolean requestingLocationUpdates = false;
     private MapViewModel mapViewModel;
@@ -101,11 +82,6 @@ public class MapFragment extends Fragment implements
     private ArrayList<LocationHolder> locations;
 
 
-
-    private static final LocationRequest locationRequest = LocationRequest.create()
-            .setPriority(LOCATION_REQUEST_PRIORITY)
-            .setInterval(STANDARD_LOCATION_UPDATE_INTERVAL_IN_SECONDS * SECONDS_TO_MILLISECONDS)
-            .setFastestInterval(STANDARD_LOCATION_UPDATE_INTERVAL_IN_SECONDS * SECONDS_TO_MILLISECONDS);
     private LocationCallback locationCallback;
     private OnLocationChangedListener mMapLocationListener = null;
 
@@ -290,7 +266,7 @@ public class MapFragment extends Fragment implements
     @SuppressLint("MissingPermission")
     private void startLocationUpdates() {
         if (requestingLocationUpdates) {
-            fusedLocationClient.requestLocationUpdates(locationRequest,
+            fusedLocationClient.requestLocationUpdates(BatteryOptions.chooseLocationPriority(getContext()),
                     locationCallback,
                     Looper.getMainLooper());
         }

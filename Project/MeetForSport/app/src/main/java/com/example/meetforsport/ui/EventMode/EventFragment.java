@@ -73,7 +73,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         EditText numOfParticipantsMinET = (EditText) root.findViewById(R.id.num_of_participants_min_et);
         numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) { }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
