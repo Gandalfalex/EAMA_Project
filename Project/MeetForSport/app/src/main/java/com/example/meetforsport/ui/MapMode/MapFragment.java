@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +90,6 @@ public class MapFragment extends Fragment implements
      * battery mode has changed and a new LocationRequest has to be issued.
      */
     private class BatteryBroadcastReceiver extends BroadcastReceiver {
-        private final static String BATTERY_LEVEL = "level";
 
         @SuppressLint("MissingPermission")
         @Override
@@ -219,6 +219,7 @@ public class MapFragment extends Fragment implements
                         if (mMapLocationListener != null) {
                             mMapLocationListener.onLocationChanged(location);
                         }
+                        Log.e("Location Update",location.toString());
                         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
                     }
                 }
