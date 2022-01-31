@@ -3,15 +3,14 @@ package com.example.meetforsport.ui.EventCreator.DataHolder;
 public class LocationHolder extends DataHolder{
 
     private String l_address = "";
-    private float longitute = 0;
-    private float latitute = 0;
+    private float longitude = 0;
+    private float latitude = 0;
 
 
-    public LocationHolder(int id, int longitute, int latitute, String name, String l_address){
+    public LocationHolder(int id, int longitude, int latitude, String name, String l_address){
         super(id, name);
-        this.latitute = latitute;
-        this.longitute = longitute;
-
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.l_address = l_address;
     }
 
@@ -23,24 +22,24 @@ public class LocationHolder extends DataHolder{
         return l_address;
     }
 
-    public float getLongitute() {
-        return longitute;
+    public float getLongitude() {
+        return longitude;
     }
 
     public void setL_address(String l_address) {
         this.l_address = l_address;
     }
 
-    public void setLongitute(String longitute) {
-        this.longitute =  Float.valueOf(longitute);
+    public void setLongitude(String longitude) {
+        this.longitude =  Float.valueOf(longitude);
     }
 
-    public void setLatitute(String latitute) {
-        this.latitute = Float.valueOf(latitute);
+    public void setLatitude(String latitude) {
+        this.latitude = Float.valueOf(latitude);
     }
 
-    public float getLatitute() {
-        return latitute;
+    public float getLatitude() {
+        return latitude;
     }
 
 }
