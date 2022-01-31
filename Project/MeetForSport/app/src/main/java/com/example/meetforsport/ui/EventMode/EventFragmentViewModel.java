@@ -1,7 +1,5 @@
 package com.example.meetforsport.ui.EventMode;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class EventFragmentViewModel extends ViewModel {
@@ -15,6 +13,9 @@ public class EventFragmentViewModel extends ViewModel {
     public EventFragmentViewModel() {
         minNumOfParticipants = null;
         maxNumOfParticipants = null;
+        setSelectedSearchRadius(5);
+        setSelectedOrderOption(1);
+        setSelectedSports(new boolean[]{true, true, true, true, true});
     }
 
     public Integer getMinNumOfParticipants() {

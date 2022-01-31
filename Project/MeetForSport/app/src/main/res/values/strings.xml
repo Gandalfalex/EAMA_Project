@@ -71,7 +71,7 @@
     <!-- Event Information -->
     <string name="headline_event_and_date">%1$s-Event on %2$s</string>
     <string name="participants">Participants</string>
-    <string name="participant_count">%1$d/%2$d</string>
+    <string name="participant_count">%1$s/%2$s</string>
     <string name="join_event">join event</string>
     <string name="event_creator">Event Creator: %1$s</string>
 

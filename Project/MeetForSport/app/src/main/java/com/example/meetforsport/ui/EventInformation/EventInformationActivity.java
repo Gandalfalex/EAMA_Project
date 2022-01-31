@@ -1,10 +1,21 @@
 package com.example.meetforsport.ui.EventInformation;
 
+import static com.example.meetforsport.ui.EventMode.EventFragment.DESCRIPTION_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_CREATOR_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_DATE_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_LAT;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_LONG;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_TIME_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.IS_USER_PARTICIPANT;
+import static com.example.meetforsport.ui.EventMode.EventFragment.MAX_PARTICIPANTS_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.PARTICIPANTS_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.SPORT_NAME_KEY;
+
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,47 +37,38 @@ public class EventInformationActivity extends AppCompatActivity implements
 
     private EventViewModel eventViewModel;
     private MapView mapView;
-    private GoogleMap googleMap;
+    private boolean isUserParticipant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_information);
-        Intent intent = getIntent();
 
-        Log.e("lol",intent.getStringExtra("lol"));
-
+        //fill view model
         eventViewModel = new ViewModelProvider(this).get(EventViewModel.class);
-        eventViewModel.setSportName("Football");
-        eventViewModel.setDate("Feb 10");
-        eventViewModel.setTime("04:20 pm");
-        eventViewModel.setNumberOfParticipants(7);
-        eventViewModel.setParticipantBound(42);
-        eventViewModel.setDescription("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.");
-        eventViewModel.setCreatorName("User11233");
-        Location dummyLocation = new Location("");
-        dummyLocation.setLatitude(53.59777525723245);
-        dummyLocation.setLongitude(6.677760110230607);
-
+        Intent intent = getIntent();
         fillInformation(intent.getExtras());
 
-        eventViewModel.setLocation(dummyLocation);
-        fillInformation(intent.getExtras());
+        //set up map
         Bundle mapViewBundle = (savedInstanceState != null) ? savedInstanceState.getBundle(MAP_KEY) : null;
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(mapViewBundle);
         mapView.getMapAsync(this);
 
+        //set up view
         ((TextView) findViewById(R.id.event_headline_tv)).setText(getResources().getString(R.string.headline_event_and_date, eventViewModel.getSportName(), eventViewModel.getDate()));
         ((TextView) findViewById(R.id.event_description_tv)).setText(eventViewModel.getDescription());
         ((TextView) findViewById(R.id.event_info_time_tv)).setText(eventViewModel.getTime());
-        ((TextView) findViewById(R.id.event_info_participants)).setText(getResources().getString(R.string.participant_count, eventViewModel.getNumberOfParticipants(), eventViewModel.getParticipantBound()));
-        ((TextView) findViewById(R.id.event_creator_tv)).setText(getResources().getString(R.string.event_creator, eventViewModel.getCreatorName()));
+        ((TextView) findViewById(R.id.event_info_participants)).setText(getResources().getString(R.string.participant_count, eventViewModel.getNumberOfParticipants()+"", ""+eventViewModel.getParticipantBound()));
+        ((TextView) findViewById(R.id.event_creator_tv)).setText(getResources().getString(R.string.created_by, eventViewModel.getCreatorName()));
         ((TextView) findViewById(R.id.event_description_tv)).setMovementMethod(new ScrollingMovementMethod());
+        if (isUserParticipant) {
+            findViewById(R.id.join_event_button).setVisibility(View.GONE);
+        }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle bundle) {
+    public void onSaveInstanceState(@NonNull Bundle bundle) {
         super.onSaveInstanceState(bundle);
 
         Bundle mapBundle = bundle.getBundle(MAP_KEY);
@@ -78,7 +80,6 @@ public class EventInformationActivity extends AppCompatActivity implements
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        this.googleMap = googleMap;
         LatLng eventLocationLatLng = new LatLng(eventViewModel.getLocation().getLatitude(), eventViewModel.getLocation().getLongitude());
         googleMap.addMarker(new MarkerOptions().position(eventLocationLatLng));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocationLatLng, 12.0f));
@@ -113,14 +114,17 @@ public class EventInformationActivity extends AppCompatActivity implements
 
 
     private void fillInformation(Bundle bundle){
-        if (bundle.size() > 1) {
-            eventViewModel.setDate(bundle.getString("date"));
-            eventViewModel.setTime(bundle.getString("time"));
-            eventViewModel.setDescription(bundle.getString("description"));
-            Location l = new Location("");
-            l.setLatitude((float) bundle.get("lat"));
-            l.setLongitude((float) bundle.get("long"));
-            eventViewModel.setLocation(l);
-        }
+        eventViewModel.setSportName(bundle.getString(SPORT_NAME_KEY));
+        eventViewModel.setDate(bundle.getString(EVENT_DATE_KEY));
+        eventViewModel.setTime(bundle.getString(EVENT_TIME_KEY));
+        eventViewModel.setNumberOfParticipants(bundle.getInt(PARTICIPANTS_KEY));
+        eventViewModel.setParticipantBound(bundle.getInt(MAX_PARTICIPANTS_KEY));
+        eventViewModel.setDescription(bundle.getString(DESCRIPTION_KEY));
+        eventViewModel.setCreatorName(bundle.getString(EVENT_CREATOR_KEY));
+        Location l = new Location("");
+        l.setLatitude(bundle.getFloat(EVENT_LAT));
+        l.setLongitude(bundle.getFloat(EVENT_LONG));
+        eventViewModel.setLocation(l);
+        isUserParticipant = bundle.getBoolean(IS_USER_PARTICIPANT);
     }
 }
