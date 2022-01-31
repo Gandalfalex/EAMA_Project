@@ -238,19 +238,23 @@ public class MapFragment extends Fragment implements
             requestingLocationUpdates = true;
             googleMap.setMyLocationEnabled(true);
             if (locations != null && events != null){
-                for (LocationHolder loc : locations){
-                    for (EventHolder even : events){
-                        if (loc.getId() == even.getL_id()){
-                            googleMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(loc.getLatitude(), loc.getLongitude()))
-                                    .title(even.getDescription()));
-                            googleMap.setOnMarkerClickListener(marker -> {
-                                Intent intent = new Intent(getActivity(), EventInformationActivity.class);
-                                intent.putExtras(bundleBuilder(even, loc));
-                                startActivity(intent);
-                                return true;
-                            });
-                        }
+                Log.d("Elements_found", events.size() + "  "  + locations.size());
+                for (EventHolder event: events){
+                    try{
+                        LocationHolder loc = locations.get(event.getL_id());
+                        Log.d("Elements_found", event.getName() + "  "  + loc.getL_address());
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(loc.getLatitude(), loc.getLongitude()))
+                                .title(event.getDescription()));
+                        googleMap.setOnMarkerClickListener(marker -> {
+                            Intent intent = new Intent(getActivity(), EventInformationActivity.class);
+                            intent.putExtras(bundleBuilder(event, loc));
+                            startActivity(intent);
+                            return true;
+                        });
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
                     }
                 }
             }

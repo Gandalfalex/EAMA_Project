@@ -48,15 +48,6 @@ public class InformationStorage {
     private EventDB eventDB;
     private SportDB sportDB;
     private LocationDB locationDB;
-    private boolean serverReachable = false;
-
-
-    private InformationStorage(Context context){
-        eventDB = new EventDB(context);
-        sportDB = new SportDB(context);
-        locationDB = new LocationDB(context);
-    }
-
 
 
     String[] projectionEvent = {
@@ -83,7 +74,15 @@ public class InformationStorage {
             LocationDB.LocationEntries.ADDRESS,
     };
 
+    private InformationStorage(Context context){
+        eventDB = new EventDB(context);
+        sportDB = new SportDB(context);
+        locationDB = new LocationDB(context);
 
+        getEvents(context);
+        getSports(context);
+        getLocations(context);
+    }
 
     public static synchronized InformationStorage getInstance(Context context) {
         if (instance == null) {
@@ -101,16 +100,16 @@ public class InformationStorage {
      * @return
      */
     public ArrayList<EventHolder> getEvents(Context context) {
-        if (events.isEmpty() && checkForUpdateConditions(eventUpdate, context)) {
+        if (!events.isEmpty() && checkForUpdateConditions(eventUpdate, context)) {
             Log.d("DB_LOAD","Load while Conditions allow to");
             events = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("events"));
             eventUpdate = LocalDateTime.now();
         }
         else{
-            Log.d("DB_LOAD","Load from EventDB");
+            Log.d("DB_LOAD_Event","Load from EventDB");
             pullFromEventDB();
-            Log.d("DB_LOAD", String.valueOf(events.size()));
+            Log.d("DB_LOAD_Event", "found " + String.valueOf(events.size() + " elements"));
         }
         return events;
     }
@@ -123,9 +122,9 @@ public class InformationStorage {
             locationUpdate = LocalDateTime.now();
         }
         else{
-            Log.d("DB_LOAD","Load from LocationsDB");
+            Log.d("DB_LOAD_Location","Load from LocationsDB");
             pullFormLocationDB();
-            Log.d("DB_LOAD", String.valueOf(locations.size()));
+            Log.d("DB_LOAD_Location", "found " + String.valueOf(locations.size() + " elements"));
         }
 
         return locations;
@@ -137,36 +136,21 @@ public class InformationStorage {
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("sports"));
             sportsUpdate = LocalDateTime.now();
         }
-        else if (sports.isEmpty()){
+        else {
+            Log.d("DB_LOAD_Sport","Load from SportDB");
             pullFromSportDB();
+            Log.d("DB_LOAD_Sport", "found " + String.valueOf(sports.size() + " elements"));
         }
         return sports;
     }
 
 
-    public boolean addEvent(EventHolder event){
-        Log.d("DB_ADD", "Event ADDED");
-        if (events.add(event)){
-            ContentValues values = new ContentValues();
-            values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
-            values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
-            values.put(EventDB.EventEntries.USER_ID, event.getU_id());
-            values.put(EventDB.EventEntries.DESCRIPTION_COLUMN, event.getDescription());
-            values.put(EventDB.EventEntries.TIME, event.getTime());
-            values.put(EventDB.EventEntries.DATE, event.getDate());
-            SQLiteDatabase db = eventDB.getWritableDatabase();
-            boolean retValue = (db.insert(EventDB.EventEntries.TABLE_NAME, null, values) != -1) ? true: false;
-            db.close();
 
-            Log.d("DB_ADD", "event in Database? " + String.valueOf(retValue));
-            return retValue;
-        }
-        return false;
-    }
 
     private void pullFromEventDB(){
-        Log.d("DB_LOAD", "loading local files");
+        Log.d("DB_LOAD_E", "loading local files");
         String sortOrder = BaseColumns._ID + " DESC";
+        eventDB.close();
         Cursor cursor = eventDB.getReadableDatabase().query(
                 EventDB.EventEntries.TABLE_NAME,
                 projectionEvent,
@@ -183,7 +167,7 @@ public class InformationStorage {
             event.setS_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.SPORT_ID)));
             event.setL_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.LOCATION_ID)));
             event.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.DESCRIPTION_COLUMN)));
-            Log.d("DB_LOAD", event.toString());
+            Log.d("DB_LOAD_E", event.getName() +  "  " + event.getTime());
             events.add(event);
         }
         eventDB.close();
@@ -206,7 +190,7 @@ public class InformationStorage {
                     cursor.getString(cursor.getColumnIndexOrThrow(SportDB.SportEntries.NAME) ));
             sport.setMaxPlayer(cursor.getInt(cursor.getColumnIndexOrThrow(SportDB.SportEntries.MIN_PLAYER)));
             sport.setMaxPlayer(cursor.getInt(cursor.getColumnIndexOrThrow(SportDB.SportEntries.MAX_PLAYER)));
-            Log.d("DB_LOAD", sport.toString());
+            Log.d("DB_LOAD", sport.getName());
             sports.add(sport);
         }
         sportDB.close();
@@ -224,24 +208,43 @@ public class InformationStorage {
                 sortOrder               // The sort order
         );
         while(cursor.moveToNext()){
-            LocationHolder loc = new LocationHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)), "that i should resolve" );
+            LocationHolder loc = new LocationHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)), cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.ADDRESS)) );
             loc.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.LATITUDE)));
             loc.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.LONGITUDE)));
             loc.setL_address(cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.ADDRESS)));
-            Log.d("DB_LOAD", loc.toString());
+            Log.d("DB_LOAD", loc.getName());
             locations.add(loc);
         }
         locationDB.close();
     }
 
 
+    public boolean addEvent(EventHolder event){
+        Log.d("DB_ADD", "Event ADDED");
+        if (events.add(event)){
+            ContentValues values = new ContentValues();
+            values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
+            values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
+            values.put(EventDB.EventEntries.USER_ID, event.getU_id());
+            values.put(EventDB.EventEntries.DESCRIPTION_COLUMN, event.getDescription());
+            values.put(EventDB.EventEntries.TIME, event.getTime());
+            values.put(EventDB.EventEntries.DATE, event.getDate());
+            SQLiteDatabase db = eventDB.getWritableDatabase();
+            boolean retValue = (db.insert(EventDB.EventEntries.TABLE_NAME, null, values) != -1) ? true: false;
+            db.close();
+            Log.d("DB_ADD", "event in Database? " + String.valueOf(retValue));
+            return retValue;
+        }
+        return false;
+    }
+
     public boolean addSport(SportHolder sport){
         if (sports.add(sport)){
+            SQLiteDatabase db = sportDB.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(SportDB.SportEntries.NAME, sport.getName());
             values.put(SportDB.SportEntries.MIN_PLAYER, sport.getMinPlayer());
             values.put(SportDB.SportEntries.MAX_PLAYER, sport.getMaxPlayer());
-            SQLiteDatabase db = sportDB.getWritableDatabase();
             boolean retValue = (db.insert(SportDB.SportEntries.TABLE_NAME, null, values) != -1) ? true: false;
             db.close();
             return retValue;
@@ -262,6 +265,31 @@ public class InformationStorage {
         return false;
     }
 
+
+    private ContentValues getEventValues(EventHolder event){
+        ContentValues values = new ContentValues();
+        values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
+        values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
+        values.put(EventDB.EventEntries.USER_ID, event.getU_id());
+        values.put(EventDB.EventEntries.DESCRIPTION_COLUMN, event.getDescription());
+        values.put(EventDB.EventEntries.TIME, event.getTime());
+        values.put(EventDB.EventEntries.DATE, event.getDate());
+        return values;
+    }
+    private ContentValues getLocationValues(LocationHolder location){
+        ContentValues values = new ContentValues();
+        values.put(LocationDB.LocationEntries.ADDRESS, location.getL_address());
+        values.put(LocationDB.LocationEntries.LATITUDE, location.getLatitude());
+        values.put(LocationDB.LocationEntries.LONGITUDE, location.getLongitude());
+        return values;
+    }
+    private ContentValues getSportValues(SportHolder sport){
+        ContentValues values = new ContentValues();
+        values.put(SportDB.SportEntries.NAME, sport.getName());
+        values.put(SportDB.SportEntries.MIN_PLAYER, sport.getMinPlayer());
+        values.put(SportDB.SportEntries.MAX_PLAYER, sport.getMaxPlayer());
+        return values;
+    }
 
 
     public JsonObjectRequest createJsonRequest(String site){
@@ -291,17 +319,16 @@ public class InformationStorage {
                         }
                         try{
                             synchronizeData(site);
+                            Log.d("DB_LOAD_Sync", "Synced data");
                         }
                         catch(ConcurrentModificationException e){
-                            Log.d("ConcurrentModificationException", "misst");
+                            Log.d("ConcurrentModificationException", "misst +" + site);
                         }
-                        serverReachable = true;
                     }
 
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        serverReachable = false;
                         Log.d("Error_No_Connection", error.toString());
                     }
                 });
@@ -311,10 +338,36 @@ public class InformationStorage {
 
 
     private void synchronizeData(String s){
+        Log.d("DB_LOAD_sync","Stored elements in db");
         switch (s){
-            case "maps":    for (LocationHolder loc: locations) addLocation(loc);
-            case "events":  for (EventHolder event: events) addEvent(event);
-            case "sports":  for (SportHolder sport: sports) addSport(sport);
+            case "events":  {
+                eventDB.onUpgrade(eventDB.getWritableDatabase(),0,0);
+                eventDB.close();
+                SQLiteDatabase db = eventDB.getWritableDatabase();
+                for (EventHolder event: events) {
+                    //Log.d("DB_LOAD_sync","Running through elements");
+                    long i = db.insert(EventDB.EventEntries.TABLE_NAME, null, getEventValues(event));
+                    Log.d("DB_LOAD_sync","saved element with result code " + i);
+                }
+                eventDB.close();
+                Log.d("DB_LOAD_Events","Stored " + events.size() + " elements in db");
+            }
+            case "maps":    {
+                locationDB.onUpgrade(locationDB.getWritableDatabase(), 0,0);
+                locationDB.close();
+                SQLiteDatabase db = locationDB.getWritableDatabase();
+                for (LocationHolder loc: locations) db.insert(LocationDB.LocationEntries.TABLE_NAME, null, getLocationValues(loc));
+                Log.d("DB_LOAD_Locations","Stored " + locations.size() + " elements in db");
+                locationDB.close();
+            }
+            case "sports": {
+                sportDB.onUpgrade(sportDB.getWritableDatabase(),0,0);
+                sportDB.close();
+                SQLiteDatabase db = sportDB.getWritableDatabase();
+                for (SportHolder sport: sports) db.insert(SportDB.SportEntries.TABLE_NAME, null, getSportValues(sport));
+                Log.d("DB_LOAD_Sport","Stored " + sports.size() + " elements in db");
+                sportDB.close();
+            }
         }
     }
 
