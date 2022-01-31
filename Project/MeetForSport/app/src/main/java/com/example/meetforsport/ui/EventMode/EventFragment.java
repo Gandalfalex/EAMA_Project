@@ -26,8 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.R;
 import com.example.meetforsport.databinding.FragmentEventBinding;
@@ -82,20 +80,15 @@ public class EventFragment extends Fragment implements View.OnClickListener {
 
 
     public JsonObjectRequest createJsonRequest(Context context){
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+        return new JsonObjectRequest
                 (Request.Method.GET, "https://192.168.178.29:8000/?year=2017&month=match", null, response -> {
                     Toast t = Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT);
                     t.show();
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Error", error.toString());
-                        Toast t = Toast.makeText(context, "of course something went wrong!", Toast.LENGTH_SHORT);
-                        t.show();
-                    }
+                }, error -> {
+                    Log.d("Error", error.toString());
+                    Toast t = Toast.makeText(context, "of course something went wrong!", Toast.LENGTH_SHORT);
+                    t.show();
                 });
-        return  jsonObjectRequest;
     }
 
     private static List<List<String>> DummyEvents(){

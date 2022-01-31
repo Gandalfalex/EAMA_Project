@@ -119,13 +119,9 @@ public class MapFragment extends Fragment implements
         events = InformationStorage.getInstance().getEvents(getContext());
         locations = InformationStorage.getInstance().getLocations(getContext());
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
-
-        //set up location updates
+        batteryBroadcastReceiver = new BatteryBroadcastReceiver();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         locationCallback = getLocationCallback();
-
-        //set up battery broadcast receiver
-        batteryBroadcastReceiver = new BatteryBroadcastReceiver();
 
         //set up view
         View v = inflater.inflate(R.layout.fragment_map, container, false);
@@ -267,7 +263,6 @@ public class MapFragment extends Fragment implements
 
     private Bundle bundleBuilder(EventHolder event, LocationHolder locationHolder){
         Bundle bundle = new Bundle();
-       // bundle.putString("lol", "1");
         bundle.putInt("id", event.getId());
         bundle.putInt("u_id", event.getU_id());
         bundle.putInt("l_id", event.getL_id());
