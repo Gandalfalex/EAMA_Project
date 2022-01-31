@@ -86,8 +86,8 @@ public class GetRequestCreator {
             String key = id_keys.next();
             if (key.equals("l_name"))       locationHolder = new LocationHolder(id, object.getString(key));
             if (key.equals("l_address"))    locationHolder.setL_address(object.getString(key));
-            if (key.equals("long"))         locationHolder.setLongitute(object.getString(key));
-            if (key.equals("lat"))          locationHolder.setLatitute(object.getString(key));
+            if (key.equals("long"))         locationHolder.setLongitude(object.getString(key));
+            if (key.equals("lat"))          locationHolder.setLatitude(object.getString(key));
         }
         return locationHolder;
     }

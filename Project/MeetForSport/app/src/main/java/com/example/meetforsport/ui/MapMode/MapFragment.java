@@ -116,8 +116,8 @@ public class MapFragment extends Fragment implements
 
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        events = InformationStorage.getInstance().getEvents(getContext());
-        locations = InformationStorage.getInstance().getLocations(getContext());
+        events = InformationStorage.getInstance(getContext()).getEvents(getContext());
+        locations = InformationStorage.getInstance(getContext()).getLocations(getContext());
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
         batteryBroadcastReceiver = new BatteryBroadcastReceiver();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -242,7 +242,7 @@ public class MapFragment extends Fragment implements
                     for (EventHolder even : events){
                         if (loc.getId() == even.getL_id()){
                             googleMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(loc.getLatitute(), loc.getLongitute()))
+                                    .position(new LatLng(loc.getLatitude(), loc.getLongitude()))
                                     .title(even.getDescription()));
                             googleMap.setOnMarkerClickListener(marker -> {
                                 Intent intent = new Intent(getActivity(), EventInformationActivity.class);
@@ -269,8 +269,8 @@ public class MapFragment extends Fragment implements
         bundle.putString(DESCRIPTION_KEY, event.getDescription());
         bundle.putString(EVENT_TIME_KEY, event.getTime());
         bundle.putString(EVENT_DATE_KEY, event.getDate());
-        bundle.putFloat(EVENT_LAT, locationHolder.getLatitute());
-        bundle.putFloat(EVENT_LONG, locationHolder.getLongitute());
+        bundle.putFloat(EVENT_LAT, locationHolder.getLatitude());
+        bundle.putFloat(EVENT_LONG, locationHolder.getLongitude());
         bundle.putInt(PARTICIPANTS_KEY, 8);
         bundle.putInt(MAX_PARTICIPANTS_KEY, 10);
         bundle.putString(EVENT_CREATOR_KEY, "User123");

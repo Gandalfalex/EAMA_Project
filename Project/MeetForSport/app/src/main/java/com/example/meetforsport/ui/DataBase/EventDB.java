@@ -1,22 +1,40 @@
-package com.example.meetforsport.ui.DataBaseEvent;
+package com.example.meetforsport.ui.DataBase;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 import androidx.annotation.Nullable;
 
 public class EventDB extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
-    private static final String SQL_DATABASE_NAME = "EventDB";
-    private static final String EVENT_ID = "e_id";
-    private static final String LONGITUDE_COLUMN = "lo_number";
-    private static final String LATITUTE_COLUMN = "la_number";
-    private static final String SPORT_NAME_COLUMN = "s_id";
-    private static final String DESCRIPTION_COLUMN = "description";
-    private static final String USER_NAME_COLUMN = "u_id";
+
+
+    public static class EventEntries implements BaseColumns {
+        public static final String TABLE_NAME = "Events";
+        public static final String LOCATION_ID = "l_id";
+        public static final String SPORT_ID = "s_id";
+        public static final String USER_ID = "u_id";
+        public static final String DESCRIPTION_COLUMN = "descr";
+        public static final String TIME = "time";
+        public static final String DATE = "date";
+    }
+
+    private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " +
+            EventEntries.TABLE_NAME + " ( " + EventEntries._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            EventEntries.LOCATION_ID + " INTEGER," +
+            EventEntries.SPORT_ID + " INTEGER," +
+            EventEntries.USER_ID + " INTEGER," +
+            EventEntries.DESCRIPTION_COLUMN + " TEXT," +
+            EventEntries.TIME + " TEXT," +
+            EventEntries.DATE + " TEXT )";
+
+
+    private static final String SQL_DELETE_ENTRIES =
+            "DROP TABLE IF EXISTS " + EventEntries.TABLE_NAME;
+
 
 
     public EventDB(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
@@ -24,24 +42,19 @@ public class EventDB extends SQLiteOpenHelper {
     }
 
     public EventDB(Context context) {
-        super(context, SQL_DATABASE_NAME, null, DATABASE_VERSION);
+        super(context,  EventEntries.TABLE_NAME , null, DATABASE_VERSION);
     }
+
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("CREATE TABLE " + SQL_DATABASE_NAME + " ("   + EVENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                LONGITUDE_COLUMN + " INT," +
-                LATITUTE_COLUMN + " INT," +
-                SPORT_NAME_COLUMN + " INT," +
-                DESCRIPTION_COLUMN + " TEXT," +
-                USER_NAME_COLUMN + " INT )"
-        );
+        sqLiteDatabase.execSQL(SQL_CREATE_ENTRIES);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + SQL_DATABASE_NAME);
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+        db.execSQL(SQL_DELETE_ENTRIES);
+        onCreate(db);
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

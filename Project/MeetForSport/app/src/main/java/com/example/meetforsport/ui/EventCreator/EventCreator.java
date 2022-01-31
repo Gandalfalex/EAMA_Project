@@ -23,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.meetforsport.R;
 import com.example.meetforsport.ui.EventCreator.DataHolder.DataHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.InformationStorage;
 import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
 import com.example.meetforsport.ui.EventCreator.DataHolder.SportHolder;
@@ -88,8 +89,8 @@ public class EventCreator extends AppCompatActivity{
 
 
     private void fetchData(){
-        sport_information = InformationStorage.getInstance().getSports(getApplicationContext());
-        map_information = InformationStorage.getInstance().getLocations(getApplicationContext());
+        sport_information = InformationStorage.getInstance(getApplicationContext()).getSports(getApplicationContext());
+        map_information = InformationStorage.getInstance(getApplicationContext()).getLocations(getApplicationContext());
     }
 
     /***
@@ -118,6 +119,13 @@ public class EventCreator extends AppCompatActivity{
             GetRequestCreator requestCreator = GetRequestCreator.getInstance(getApplicationContext());
             requestCreator.postRequest(buildEventObject(1,
                     description, time, date), 2, "send");
+            EventHolder event = new EventHolder(1, "goPlay");
+            event.setS_id(sport_information.get(sport_position).getId());
+            event.setL_id(map_information.get(map_position).getId());
+            event.setDescription(description);
+            event.setDate(date);
+            event.setTime(time);
+            InformationStorage.getInstance(getApplicationContext()).addEvent(event);
             return true;
         }
         Toast warning = Toast.makeText(getApplicationContext(), errorWarning, Toast.LENGTH_LONG);
