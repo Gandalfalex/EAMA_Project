@@ -19,10 +19,6 @@
       app:layout_constraintTop_toTopOf="parent"
       tools:layout_editor_absoluteX="0dp">
 
-
-    <!-- location part -->
-
-
     <TextView
         android:id="@+id/event_introduction"
         android:layout_width="wrap_content"
@@ -42,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="33dp"
+        android:layout_marginTop="32dp"
         android:layout_below="@+id/event_introduction">
 
 
@@ -74,93 +70,84 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/time_and_date_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
+        android:layout_marginTop="32dp"
         android:gravity="center"
         android:text="@string/location"
         android:textSize="@dimen/activity_sectionHeadline" />
 
-    <Button
-        android:id="@+id/find_location_btn"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/location_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/location_textview_headline"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="30dp"
-        android:text="@string/find_location"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageView
-        android:id="@+id/gps_view"
-        android:layout_width="46dp"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/find_location_btn"
-        android:layout_alignBottom="@+id/find_location_btn"
-        android:layout_marginEnd="152dp"
-        android:layout_toStartOf="@+id/find_location_btn"
-        android:src="@drawable/ic_baseline_gps_fixed" />
-
-
-    <TextView
-        android:id="@+id/address"
-        android:layout_width="100dp"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/find_location_btn"
-        android:layout_alignBottom="@+id/find_location_btn"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="30dp"
-        android:layout_toStartOf="@+id/find_location_btn"
-        android:text="@string/address"
-        app:layout_constraintStart_toEndOf="@+id/gps_view" />
+        android:layout_marginTop="32dp"
+        android:layout_below="@+id/location_textview_headline">
+
+      <TextView
+          android:id="@+id/address"
+          android:layout_width="0dp"
+          android:layout_weight="0.5"
+          android:gravity="center"
+          android:layout_marginHorizontal="16dp"
+          android:layout_height="wrap_content"
+          app:drawableStartCompat="@drawable/ic_baseline_gps_fixed"
+          android:text="@string/address"
+          />
+
+      <Button
+          android:id="@+id/find_location_btn"
+          android:layout_width="0dp"
+          android:layout_weight="0.5"
+          android:layout_marginHorizontal="16dp"
+          android:layout_height="wrap_content"
+          android:text="@string/find_location"
+          />
+
+    </LinearLayout>
 
     <!-- Sport part -->
-
-    <ImageView
-        android:id="@+id/sport_view"
-        android:layout_width="46dp"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/find_sport_btn"
-        android:layout_alignBottom="@+id/find_sport_btn"
-        android:layout_marginEnd="152dp"
-        android:layout_toStartOf="@+id/find_sport_btn"
-        android:src="@drawable/ic_baseline_sport" />
 
     <TextView
         android:id="@+id/sport_textview_headline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/find_location_btn"
+        android:layout_below="@+id/location_layout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
+        android:layout_marginTop="32dp"
         android:gravity="center"
         android:text="@string/sport"
         android:textSize="@dimen/activity_sectionHeadline" />
 
-    <TextView
-        android:id="@+id/sport_selection"
+    <LinearLayout
+        android:id="@+id/sport_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="32dp"
         android:gravity="center"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/find_sport_btn"
-        android:layout_alignBottom="@+id/find_sport_btn"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="30dp"
-        android:layout_toStartOf="@+id/find_sport_btn"
-        android:text="@string/sport" />
+        android:layout_below="@+id/sport_textview_headline">
 
-    <Button
-        android:id="@+id/find_sport_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/sport_textview_headline"
-        android:layout_alignStart="@+id/find_location_btn"
-        android:layout_alignLeft="@+id/find_location_btn"
-        android:layout_alignEnd="@+id/find_location_btn"
-        android:layout_alignRight="@+id/find_location_btn"
-        android:layout_marginTop="20dp"
-        android:text="@string/find_sport"
-        app:layout_constraintStart_toEndOf="@+id/sport_view" />
+      <TextView
+          android:id="@+id/sport_selection"
+          android:gravity="center"
+          android:layout_width="0dp"
+          android:layout_weight="0.5"
+          android:layout_marginHorizontal="16dp"
+          android:layout_height="wrap_content"
+          app:drawableStartCompat="@drawable/ic_baseline_sport"
+          android:text="@string/sport" />
+
+      <Button
+          android:id="@+id/find_sport_btn"
+          android:layout_width="0dp"
+          android:layout_weight="0.5"
+          android:layout_marginHorizontal="16dp"
+          android:layout_height="wrap_content"
+          android:text="@string/find_sport"
+          />
+
+    </LinearLayout>
 
 
 
@@ -168,8 +155,8 @@
         android:id="@+id/event_description"
         android:layout_width="383dp"
         android:layout_height="78dp"
-        android:layout_below="@+id/find_sport_btn"
-        android:layout_marginTop="50dp"
+        android:layout_below="@+id/sport_layout"
+        android:layout_marginTop="32dp"
         android:ems="10"
         android:gravity="start|top"
         android:hint="@string/description"
@@ -181,7 +168,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/event_description"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="32dp"
         android:textSize="18sp"
         android:padding="16dp"
         android:gravity="center"
