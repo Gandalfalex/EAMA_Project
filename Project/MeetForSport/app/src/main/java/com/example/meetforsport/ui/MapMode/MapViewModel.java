@@ -1,7 +1,5 @@
 package com.example.meetforsport.ui.MapMode;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class MapViewModel extends ViewModel {
@@ -14,6 +12,8 @@ public class MapViewModel extends ViewModel {
     public MapViewModel() {
         minNumOfParticipants = null;
         maxNumOfParticipants = null;
+        setSelectedSearchRadius(5);
+        setSelectedSports(new boolean[]{true, true, true, true, true});
     }
 
     public Integer getMinNumOfParticipants() {

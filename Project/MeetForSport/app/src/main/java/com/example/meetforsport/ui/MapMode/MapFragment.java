@@ -1,9 +1,18 @@
 package com.example.meetforsport.ui.MapMode;
 
+import static com.example.meetforsport.ui.EventMode.EventFragment.DESCRIPTION_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_CREATOR_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_DATE_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_LAT;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_LONG;
+import static com.example.meetforsport.ui.EventMode.EventFragment.EVENT_TIME_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.IS_USER_PARTICIPANT;
+import static com.example.meetforsport.ui.EventMode.EventFragment.MAX_PARTICIPANTS_KEY;
+import static com.example.meetforsport.ui.EventMode.EventFragment.PARTICIPANTS_KEY;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -49,7 +58,6 @@ import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -110,11 +118,7 @@ public class MapFragment extends Fragment implements
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         events = InformationStorage.getInstance().getEvents(getContext());
         locations = InformationStorage.getInstance().getLocations(getContext());
-
-        //set up view model
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
-        mapViewModel.setSelectedSearchRadius(5);
-        mapViewModel.setSelectedSports(new boolean[]{true, true, true, true, true});
 
         //set up location updates
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -176,6 +180,7 @@ public class MapFragment extends Fragment implements
         super.onDestroyView();
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -230,7 +235,7 @@ public class MapFragment extends Fragment implements
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_CODE);
         }
         else {
@@ -243,15 +248,11 @@ public class MapFragment extends Fragment implements
                             googleMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(loc.getLatitute(), loc.getLongitute()))
                                     .title(even.getDescription()));
-                            googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                                @Override
-                                public boolean onMarkerClick(@NonNull Marker marker) {
-                                    Intent intent = new Intent(getActivity(), EventInformationActivity.class);
-                                    intent.putExtra("lol",1+"");
-                                    intent.putExtras(bundleBuilder(even, loc));
-                                    startActivity(intent);
-                                    return true;
-                                }
+                            googleMap.setOnMarkerClickListener(marker -> {
+                                Intent intent = new Intent(getActivity(), EventInformationActivity.class);
+                                intent.putExtras(bundleBuilder(even, loc));
+                                startActivity(intent);
+                                return true;
                             });
                         }
                     }
@@ -270,11 +271,15 @@ public class MapFragment extends Fragment implements
         bundle.putInt("id", event.getId());
         bundle.putInt("u_id", event.getU_id());
         bundle.putInt("l_id", event.getL_id());
-        bundle.putString("description", event.getDescription());
-        bundle.putString("time", event.getTime());
-        bundle.putString("date", event.getDate());
-        bundle.putFloat("lat", locationHolder.getLatitute());
-        bundle.putFloat("long", locationHolder.getLongitute());
+        bundle.putString(DESCRIPTION_KEY, event.getDescription());
+        bundle.putString(EVENT_TIME_KEY, event.getTime());
+        bundle.putString(EVENT_DATE_KEY, event.getDate());
+        bundle.putFloat(EVENT_LAT, locationHolder.getLatitute());
+        bundle.putFloat(EVENT_LONG, locationHolder.getLongitute());
+        bundle.putInt(PARTICIPANTS_KEY, 8);
+        bundle.putInt(MAX_PARTICIPANTS_KEY, 10);
+        bundle.putString(EVENT_CREATOR_KEY, "User123");
+        bundle.putBoolean(IS_USER_PARTICIPANT, false);
         return bundle;
     }
 
@@ -316,28 +321,29 @@ public class MapFragment extends Fragment implements
         mapView.onLowMemory();
     }
 
+    /**
+     * Connects the search radius text view to the value selected with the slider.
+     * @param v the root view
+     */
     private void setUpSlider(View v) {
         TextView searchRadiusTV = v.findViewById(R.id.search_radius_tv);
         Slider searchRadiusSlider = v.findViewById(R.id.search_radius_slider);
         searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
         searchRadiusSlider.setValue(mapViewModel.getSelectedSearchRadius());
-        searchRadiusSlider.addOnChangeListener(new Slider.OnChangeListener() {
-            @Override
-            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                mapViewModel.setSelectedSearchRadius(Math.round(value));
-                searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
-            }
+        searchRadiusSlider.addOnChangeListener((slider, value, fromUser) -> {
+            mapViewModel.setSelectedSearchRadius(Math.round(value));
+            searchRadiusTV.setText(getResources().getString(R.string.search_radius, mapViewModel.getSelectedSearchRadius()));
         });
     }
 
     /**
      * This function connects the min max participant editTexts to the viewModel. It also adds
      * some logic that stops leading zeros and numbers greater than 999 as an input.
-     * @param v the main view
+     * @param v the root view
      */
     private void setUpMinMaxEditTexts(View v) {
 
-        EditText numOfParticipantsMinET = (EditText) v.findViewById(R.id.num_of_participants_min_et);
+        EditText numOfParticipantsMinET = v.findViewById(R.id.num_of_participants_min_et);
         numOfParticipantsMinET.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -412,47 +418,44 @@ public class MapFragment extends Fragment implements
         //just temporary, will be connected with database in the future
         String[] sports = {"Select All", "Football", "Basketball", "Volley Ball", "Running"};
 
-        builder.setMultiChoiceItems(sports, mapViewModel.getSelectedSports(), new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                ListView list = ((AlertDialog) dialog).getListView();
-                boolean[] selectedSports = mapViewModel.getSelectedSports();
-                int numberOfItems = selectedSports.length;
-                if (which == 0) {
-                    //set all others to true when "select all" is checked
-                    if (isChecked) {
-                        for (int i = 0; i < list.getCount(); i++) {
-                            list.setItemChecked(i, true);
-                            selectedSports[i] = true;
-                        }
-                        //set all others to false when "select all" is unchecked
-                    } else {
-                        for (int i = 0; i < list.getCount(); i++) {
-                            list.setItemChecked(i, false);
-                            selectedSports[i] = false;
-                        }
+        builder.setMultiChoiceItems(sports, mapViewModel.getSelectedSports(), (dialog, which, isChecked) -> {
+            ListView list = ((AlertDialog) dialog).getListView();
+            boolean[] selectedSports = mapViewModel.getSelectedSports();
+            int numberOfItems = selectedSports.length;
+            if (which == 0) {
+                //set all others to true when "select all" is checked
+                if (isChecked) {
+                    for (int i = 0; i < list.getCount(); i++) {
+                        list.setItemChecked(i, true);
+                        selectedSports[i] = true;
                     }
-                } else if (which > 0) {
-                    selectedSports[which] = isChecked;
-                    //set "select all" to false if any item is unchecked
-                    if (!isChecked) {
-                        list.setItemChecked(0, false);
-                        selectedSports[0] = false;
-                    }
-                    //set "select alL" to true if all items are checked
-                    if (!selectedSports[0] && list.getCheckedItemCount() == (numberOfItems - 1)) {
-                        list.setItemChecked(0, true);
-                        selectedSports[0] = true;
-                    }
-                }
-                //change text on button to say the number of selected sports
-                if (list.getCheckedItemCount() == numberOfItems) {
-                    sportSelectionBtn.setText(getResources().getString(R.string.all_selected));
+                    //set all others to false when "select all" is unchecked
                 } else {
-                    sportSelectionBtn.setText(getResources().getString(R.string.number_selected, list.getCheckedItemCount()));
+                    for (int i = 0; i < list.getCount(); i++) {
+                        list.setItemChecked(i, false);
+                        selectedSports[i] = false;
+                    }
                 }
-                mapViewModel.setSelectedSports(selectedSports);
+            } else if (which > 0) {
+                selectedSports[which] = isChecked;
+                //set "select all" to false if any item is unchecked
+                if (!isChecked) {
+                    list.setItemChecked(0, false);
+                    selectedSports[0] = false;
+                }
+                //set "select alL" to true if all items are checked
+                if (!selectedSports[0] && list.getCheckedItemCount() == (numberOfItems - 1)) {
+                    list.setItemChecked(0, true);
+                    selectedSports[0] = true;
+                }
             }
+            //change text on button to say the number of selected sports
+            if (list.getCheckedItemCount() == numberOfItems) {
+                sportSelectionBtn.setText(getResources().getString(R.string.all_selected));
+            } else {
+                sportSelectionBtn.setText(getResources().getString(R.string.number_selected, list.getCheckedItemCount()));
+            }
+            mapViewModel.setSelectedSports(selectedSports);
         });
         builder.setPositiveButton("OK", null);
 
