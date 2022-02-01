@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class LocationDB extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public LocationDB(Context context) {
         super(context,  LocationEntries.TABLE_NAME , null, DATABASE_VERSION);

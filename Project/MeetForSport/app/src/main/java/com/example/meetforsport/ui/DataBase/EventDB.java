@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class EventDB extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
 
     public static class EventEntries implements BaseColumns {
@@ -20,12 +20,12 @@ public class EventDB extends SQLiteOpenHelper {
         public static final String DESCRIPTION_COLUMN = "descr";
         public static final String TIME = "time";
         public static final String DATE = "date";
-       // public static final String NAME = "name";
+        public static final String NAME = "name";
     }
 
     private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " +
             EventEntries.TABLE_NAME + " ( " + EventEntries._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-      //
+            EventEntries.NAME + " TEXT," +
             EventEntries.LOCATION_ID + " INTEGER," +
             EventEntries.SPORT_ID + " INTEGER," +
             EventEntries.USER_ID + " INTEGER," +

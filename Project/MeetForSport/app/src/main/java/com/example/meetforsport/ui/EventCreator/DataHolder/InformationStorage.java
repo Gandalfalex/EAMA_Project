@@ -52,6 +52,7 @@ public class InformationStorage {
 
     String[] projectionEvent = {
             BaseColumns._ID,
+            EventDB.EventEntries.NAME,
             EventDB.EventEntries.LOCATION_ID,
             EventDB.EventEntries.SPORT_ID,
             EventDB.EventEntries.USER_ID,
@@ -101,6 +102,7 @@ public class InformationStorage {
      * @return
      */
     public ArrayList<EventHolder> getEvents(Context context) {
+        Log.d("DB_Problem", "DB gets loaded");
         if (!events.isEmpty() && checkForUpdateConditions(eventUpdate, context)) {
             Log.d("DB_LOAD","Load while Conditions allow to");
             events = new ArrayList<>();
@@ -112,6 +114,7 @@ public class InformationStorage {
             pullFromEventDB();
             Log.d("DB_LOAD_Event", "found " + String.valueOf(events.size() + " elements"));
         }
+        Log.d("DB_Problem", "found " + events.size());
         return events;
     }
 
@@ -167,6 +170,10 @@ public class InformationStorage {
         if (position >= events.size()){
             return events.get(0);
         }
+        if (events.isEmpty()) {
+            pullFromEventDB();
+            return events.get(0);
+        }
         return events.get(position);
     }
 
@@ -193,11 +200,13 @@ public class InformationStorage {
                 sortOrder               // The sort order
         );
         while(cursor.moveToNext()){
-            EventHolder event = new EventHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)), "SPORT" );
+            EventHolder event = new EventHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.NAME)));
             event.setTime(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.TIME)));
             event.setDate(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.DATE)));
             event.setS_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.SPORT_ID)));
             event.setL_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.LOCATION_ID)));
+            event.setU_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.USER_ID)));
             event.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.DESCRIPTION_COLUMN)));
             Log.d("DB_LOAD_E", event.getName() +  "  " + event.getTime());
             events.add(event);
@@ -258,6 +267,7 @@ public class InformationStorage {
         Log.d("DB_ADD", "Event ADDED");
         if (events.add(event)){
             ContentValues values = new ContentValues();
+            values.put(EventDB.EventEntries.NAME, event.getName());
             values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
             values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
             values.put(EventDB.EventEntries.USER_ID, event.getU_id());
@@ -304,6 +314,7 @@ public class InformationStorage {
 
     private ContentValues getEventValues(EventHolder event){
         ContentValues values = new ContentValues();
+        values.put(EventDB.EventEntries.NAME, event.getName());
         values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
         values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
         values.put(EventDB.EventEntries.USER_ID, event.getU_id());
@@ -314,6 +325,7 @@ public class InformationStorage {
     }
     private ContentValues getLocationValues(LocationHolder location){
         ContentValues values = new ContentValues();
+        values.put(LocationDB.LocationEntries.NAME, location.getName());
         values.put(LocationDB.LocationEntries.ADDRESS, location.getL_address());
         values.put(LocationDB.LocationEntries.LATITUDE, location.getLatitude());
         values.put(LocationDB.LocationEntries.LONGITUDE, location.getLongitude());
@@ -365,6 +377,9 @@ public class InformationStorage {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        pullFromEventDB();
+                        pullFormLocationDB();
+                        pullFromSportDB();
                         Log.d("Error_No_Connection", error.toString());
                     }
                 });
@@ -428,7 +443,8 @@ public class InformationStorage {
         EventHolder eventHolder = null;
         for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
             String key = id_keys.next();
-            if (key.equals("user_id"))      eventHolder = new EventHolder(id, object.getString(key));
+            if (key.equals("name"))         eventHolder = new EventHolder(id, object.getString(key));
+            if (key.equals("user_id"))      eventHolder.setU_id(object.getInt(key));
             if (key.equals("time"))         eventHolder.setTime(object.getString(key));
             if (key.equals("date"))         eventHolder.setDate(object.getString(key));
             if (key.equals("description"))  eventHolder.setDescription(object.getString(key));
