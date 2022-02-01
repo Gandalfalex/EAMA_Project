@@ -20,10 +20,12 @@ public class EventDB extends SQLiteOpenHelper {
         public static final String DESCRIPTION_COLUMN = "descr";
         public static final String TIME = "time";
         public static final String DATE = "date";
+       // public static final String NAME = "name";
     }
 
     private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " +
             EventEntries.TABLE_NAME + " ( " + EventEntries._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+      //
             EventEntries.LOCATION_ID + " INTEGER," +
             EventEntries.SPORT_ID + " INTEGER," +
             EventEntries.USER_ID + " INTEGER," +

@@ -15,6 +15,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.IDNA;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,19 +26,26 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.meetforsport.R;
+import com.example.meetforsport.ui.EventCreator.DataHolder.EventHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.InformationStorage;
+import com.example.meetforsport.ui.EventCreator.DataHolder.LocationHolder;
+import com.example.meetforsport.ui.EventCreator.DataHolder.SportHolder;
 import com.example.meetforsport.ui.EventInformation.EventInformationActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.SViewHolder> {
 
 
-    private final List<List<String>> information;
+    private final ArrayList<EventHolder> information;
+    private  InformationStorage storage;
     private final Context context;
     private final Activity activity;
 
-    public RecyclerViewAdapter(Context context, Activity activity, List<List<String>> eventInformation){
-        information = eventInformation;
+    public RecyclerViewAdapter(Context context, Activity activity){
+        storage =  InformationStorage.getInstance(context);
+        information = storage.getEvents(context);
         this.context = context;
         this.activity = activity;
     }
@@ -51,14 +60,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull SViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        holder.event_sport.setText(information.get(position).get(0));
-        holder.event_time.setText(information.get(position).get(1));
-        holder.event_date.setText(information.get(position).get(2));
-        holder.event_participants.setText(context.getResources().getString(R.string.participant_count,information.get(position).get(3),information.get(position).get(4)));
-        holder.event_creator.setText(context.getResources().getString(R.string.created_by,information.get(position).get(5)));
+        Log.d("position out of bounds", String.valueOf(position));
+        holder.event_sport.setText(information.get(position).getName());
+        holder.event_time.setText(information.get(position).getTime());
+        holder.event_date.setText(information.get(position).getDate());
+
+        SportHolder sport = storage.getSport(information.get(position).getS_id());
+        LocationHolder locationHolder = storage.getLocation(information.get(position).getL_id());
+
+        holder.event_participants.setText(sport.getName());
+        holder.event_creator.setText("by " + information.get(position).getU_id());
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(activity, EventInformationActivity.class);
-            activity.startActivity(fillIntent(intent, information.get(position)));
+            activity.startActivity(fillIntent(intent, information.get(position), sport, locationHolder));
         });
     }
 
@@ -83,16 +97,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         }
     }
 
-    private Intent fillIntent(Intent intent, List<String> eventInformation) {
-        intent.putExtra(SPORT_NAME_KEY, eventInformation.get(0));
-        intent.putExtra(EVENT_TIME_KEY, eventInformation.get(1));
-        intent.putExtra(EVENT_DATE_KEY, eventInformation.get(2));
-        intent.putExtra(PARTICIPANTS_KEY, Integer.parseInt(eventInformation.get(3)));
-        intent.putExtra(MAX_PARTICIPANTS_KEY, Integer.parseInt(eventInformation.get(4)));
-        intent.putExtra(EVENT_CREATOR_KEY, eventInformation.get(5));
-        intent.putExtra(EVENT_LAT, (float) 53.59777525723245);
-        intent.putExtra(EVENT_LONG, (float) 6.677760110230607);
-        intent.putExtra(DESCRIPTION_KEY, "Example Description...");
+    private Intent fillIntent(Intent intent, EventHolder event, SportHolder sportHolder, LocationHolder locationHolder) {
+        intent.putExtra(SPORT_NAME_KEY, event.getName());
+        intent.putExtra(EVENT_TIME_KEY, event.getTime());
+        intent.putExtra(EVENT_DATE_KEY, event.getDate());
+        intent.putExtra(PARTICIPANTS_KEY, sportHolder.getMinPlayer());
+        intent.putExtra(MAX_PARTICIPANTS_KEY, sportHolder.getMaxPlayer());
+        intent.putExtra(EVENT_CREATOR_KEY, event.getU_id());
+        intent.putExtra(EVENT_LAT, locationHolder.getLatitude());
+        intent.putExtra(EVENT_LONG, locationHolder.getLongitude());
+        intent.putExtra(DESCRIPTION_KEY, event.getDescription());
         intent.putExtra(IS_USER_PARTICIPANT, false);
         return intent;
     }

@@ -73,7 +73,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         //fill recycler view with dummy events
         RecyclerView recyclerView = root.findViewById(R.id.events_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(new RecyclerViewAdapter(getContext(), getActivity(), DummyEvents()));
+        recyclerView.setAdapter(new RecyclerViewAdapter(getContext(), getActivity()));
 
         return root;
     }
@@ -91,7 +91,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
                 });
     }
 
-    private static List<List<String>> DummyEvents(){
+    /*private static List<List<String>> DummyEvents(){
         List<List<String>> myList = new ArrayList<>();
         myList.add(Arrays.asList("Football", "11:30", "08.02","8", "10","User123"));
         myList.add(Arrays.asList("Running", "12:00", "08.02","3", "4","User34"));
@@ -105,6 +105,7 @@ public class EventFragment extends Fragment implements View.OnClickListener {
         myList.add(Arrays.asList("Football", "18:00", "11.02","6", "20","User333"));
         return myList;
     }
+    */
 
     @Override
     public void onDestroyView(){

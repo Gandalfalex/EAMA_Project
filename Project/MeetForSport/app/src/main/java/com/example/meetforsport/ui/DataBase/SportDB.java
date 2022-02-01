@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class SportDB extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public SportDB(Context context) {
         super(context,  SportEntries.TABLE_NAME , null, DATABASE_VERSION);
@@ -21,9 +21,9 @@ public class SportDB extends SQLiteOpenHelper {
 
     public static class SportEntries implements BaseColumns {
         public static final String TABLE_NAME = "Sports";
-        public static final String NAME = "long";
-        public static final String MIN_PLAYER = "lat";
-        public static final String MAX_PLAYER = "address";
+        public static final String NAME = "name";
+        public static final String MIN_PLAYER = "minPlayer";
+        public static final String MAX_PLAYER = "maxPlayer";
     }
 
     private static final String SQL_CREATE_ENTRIES = "CREATE TABLE " +

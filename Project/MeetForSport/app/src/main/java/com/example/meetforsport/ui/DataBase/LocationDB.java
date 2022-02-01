@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 public class LocationDB extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public LocationDB(Context context) {
         super(context,  LocationEntries.TABLE_NAME , null, DATABASE_VERSION);
@@ -23,6 +23,7 @@ public class LocationDB extends SQLiteOpenHelper {
         public static final String TABLE_NAME = "Locations";
         public static final String LONGITUDE = "long";
         public static final String LATITUDE = "lat";
+        public static final String NAME = "name";
         public static final String ADDRESS = "address";
     }
 
@@ -30,6 +31,7 @@ public class LocationDB extends SQLiteOpenHelper {
             LocationEntries.TABLE_NAME + " ( " + LocationEntries._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             LocationEntries.LONGITUDE + " REAL," +
             LocationEntries.LATITUDE + " REAL," +
+            LocationEntries.NAME + " TEXT," +
             LocationEntries.ADDRESS + " TEXT )";
 
     private static final String SQL_DELETE_ENTRIES =

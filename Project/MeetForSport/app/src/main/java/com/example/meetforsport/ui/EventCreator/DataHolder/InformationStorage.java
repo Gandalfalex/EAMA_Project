@@ -64,6 +64,7 @@ public class InformationStorage {
 
     String[] projectionLocations = {
             BaseColumns._ID,
+            LocationDB.LocationEntries.NAME,
             LocationDB.LocationEntries.LONGITUDE,
             LocationDB.LocationEntries.LATITUDE,
             LocationDB.LocationEntries.ADDRESS,
@@ -140,9 +141,40 @@ public class InformationStorage {
     }
 
 
+    /***
+     * TODO real fault handeling
+     * @param position
+     * @return
+     */
+    public SportHolder getSport(int position){
+        if (position >= sports.size()){
+            return sports.get(0);
+        }
+        return sports.get(position);
+    }
+
+    /***
+     * TODO real fault handeling
+     * @param position
+     * @return
+     */
+    public EventHolder getEvent(int position){
+        if (position >= events.size()){
+            return events.get(0);
+        }
+        return events.get(position);
+    }
+
+    public LocationHolder getLocation(int position){
+        if (position >= locations.size()){
+            return locations.get(0);
+        }
+        return locations.get(position);
+    }
 
 
     private void pullFromEventDB(){
+        events.clear();
         Log.d("DB_LOAD_E", "loading local files");
         String sortOrder = BaseColumns._ID + " DESC";
         eventDB.close();
@@ -169,6 +201,7 @@ public class InformationStorage {
     }
 
     private void pullFromSportDB(){
+        sports.clear();
         String sortOrder = BaseColumns._ID + " DESC";
         Cursor cursor = sportDB.getReadableDatabase().query(
                 SportDB.SportEntries.TABLE_NAME,
@@ -192,6 +225,7 @@ public class InformationStorage {
     }
 
     private void pullFormLocationDB(){
+        locations.clear();
         String sortOrder = BaseColumns._ID + " DESC";
         Cursor cursor = locationDB.getReadableDatabase().query(
                 LocationDB.LocationEntries.TABLE_NAME,
@@ -203,7 +237,8 @@ public class InformationStorage {
                 sortOrder               // The sort order
         );
         while(cursor.moveToNext()){
-            LocationHolder loc = new LocationHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)), cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.ADDRESS)) );
+            LocationHolder loc = new LocationHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.NAME)) );
             loc.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.LATITUDE)));
             loc.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.LONGITUDE)));
             loc.setL_address(cursor.getString(cursor.getColumnIndexOrThrow(LocationDB.LocationEntries.ADDRESS)));
@@ -246,6 +281,7 @@ public class InformationStorage {
         }
         return false;
     }
+
     public boolean addLocation(LocationHolder location){
         if (locations.add(location)){
             ContentValues values = new ContentValues();
@@ -339,11 +375,7 @@ public class InformationStorage {
                 eventDB.onUpgrade(eventDB.getWritableDatabase(),0,0);
                 eventDB.close();
                 SQLiteDatabase db = eventDB.getWritableDatabase();
-                for (EventHolder event: events) {
-                    //Log.d("DB_LOAD_sync","Running through elements");
-                    long i = db.insert(EventDB.EventEntries.TABLE_NAME, null, getEventValues(event));
-                    Log.d("DB_LOAD_sync","saved element with result code " + i);
-                }
+                for (EventHolder event: events) db.insert(EventDB.EventEntries.TABLE_NAME, null, getEventValues(event));
                 eventDB.close();
                 Log.d("DB_LOAD_Events","Stored " + events.size() + " elements in db");
             }
