@@ -15,6 +15,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.meetforsport.ui.Batterymanager.BatteryOptions;
 import com.example.meetforsport.ui.DataBase.EventDB;
 import com.example.meetforsport.ui.DataBase.LocationDB;
 import com.example.meetforsport.ui.DataBase.SportDB;
@@ -38,12 +39,6 @@ public class InformationStorage {
     private LocalDateTime eventUpdate;
     private LocalDateTime locationUpdate;
     private LocalDateTime sportsUpdate;
-
-    private int BATTERY_LOW = 15;
-    private int BATTERY_CRITICAL = 5;
-
-    private int updateInterval_normal = 2;
-    private int updateInterval_critical = 12;
 
     private EventDB eventDB;
     private SportDB sportDB;
@@ -100,7 +95,7 @@ public class InformationStorage {
      * @return
      */
     public ArrayList<EventHolder> getEvents(Context context) {
-        if (!events.isEmpty() && checkForUpdateConditions(eventUpdate, context)) {
+        if (!events.isEmpty() && BatteryOptions.checkForUpdateConditions(eventUpdate, context)) {
             Log.d("DB_LOAD","Load while Conditions allow to");
             events = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("events"));
@@ -116,7 +111,7 @@ public class InformationStorage {
 
 
     public ArrayList<LocationHolder> getLocations(Context context) {
-        if (locations.isEmpty() && checkForUpdateConditions(locationUpdate, context) ) {
+        if (locations.isEmpty() && BatteryOptions.checkForUpdateConditions(locationUpdate, context) ) {
             locations = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("maps"));
             locationUpdate = LocalDateTime.now();
@@ -131,7 +126,7 @@ public class InformationStorage {
     }
 
     public ArrayList<SportHolder> getSports(Context context) {
-        if (sports.isEmpty() && checkForUpdateConditions(sportsUpdate, context)) {
+        if (sports.isEmpty() && BatteryOptions.checkForUpdateConditions(sportsUpdate, context)) {
             sports = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("sports"));
             sportsUpdate = LocalDateTime.now();
@@ -424,32 +419,6 @@ public class InformationStorage {
 
         }
         return sportHolder;
-    }
-
-
-    /***
-     * Adaptation Mechanism, pull data only if necessary
-     * @param time
-     * @param context
-     * @return
-     */
-    private boolean checkForUpdateConditions(LocalDateTime time, Context context){
-        if (time == null) return true;
-
-        boolean time_b = time.isAfter(LocalDateTime.now().plusHours(updateInterval_normal));
-
-        BatteryManager bm = (BatteryManager) context.getSystemService(BATTERY_SERVICE);
-        int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
-      
-        if (batLevel > BATTERY_LOW) {
-            return time_b;
-        }
-        else if (batLevel < BATTERY_LOW && batLevel > BATTERY_CRITICAL){
-            return time.isAfter(LocalDateTime.now().plusHours(updateInterval_critical));
-        }
-        else {
-            return false;
-        }
     }
 
 }
