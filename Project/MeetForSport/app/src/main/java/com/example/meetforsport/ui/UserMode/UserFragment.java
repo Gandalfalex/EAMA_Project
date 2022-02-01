@@ -48,7 +48,7 @@ public class UserFragment extends Fragment {
 
         RecyclerView recyclerView = root.findViewById(R.id.event_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        recyclerView.setAdapter(new RecyclerViewAdapter(getContext(), getActivity(), DummyEvents()));
+        recyclerView.setAdapter(new RecyclerViewAdapter(getContext(), getActivity()));
 
         return root;
     }
