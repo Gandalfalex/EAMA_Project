@@ -60,13 +60,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull SViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        Log.d("position out of bounds", String.valueOf(position));
-        holder.event_sport.setText(information.get(position).getName());
-        holder.event_time.setText(information.get(position).getTime());
-        holder.event_date.setText(information.get(position).getDate());
-
         SportHolder sport = storage.getSport(information.get(position).getS_id());
         LocationHolder locationHolder = storage.getLocation(information.get(position).getL_id());
+        Log.d("position out of bounds", String.valueOf(position));
+
+        holder.event_sport.setText(sport.getName());
+        holder.event_time.setText(information.get(position).getTime());
+        holder.event_date.setText(information.get(position).getDate());
 
         holder.event_participants.setText(sport.getName());
         holder.event_creator.setText("by " + information.get(position).getU_id());
