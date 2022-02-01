@@ -47,6 +47,7 @@ public class InformationStorage {
 
     String[] projectionEvent = {
             BaseColumns._ID,
+            EventDB.EventEntries.NAME,
             EventDB.EventEntries.LOCATION_ID,
             EventDB.EventEntries.SPORT_ID,
             EventDB.EventEntries.USER_ID,
@@ -96,7 +97,7 @@ public class InformationStorage {
      * @return
      */
     public ArrayList<EventHolder> getEvents(Context context) {
-        if (!events.isEmpty() && BatteryOptions.checkForUpdateConditions(eventUpdate, context)) {
+        if (events.isEmpty() && BatteryOptions.checkForUpdateConditions(eventUpdate, context)) {
             Log.d("DB_LOAD","Load while Conditions allow to");
             events = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("events"));
@@ -188,7 +189,8 @@ public class InformationStorage {
                 sortOrder               // The sort order
         );
         while(cursor.moveToNext()){
-            EventHolder event = new EventHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)), "SPORT" );
+            EventHolder event = new EventHolder(cursor.getInt(cursor.getColumnIndexOrThrow(BaseColumns._ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.NAME)) );
             event.setTime(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.TIME)));
             event.setDate(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.DATE)));
             event.setS_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.SPORT_ID)));
@@ -253,6 +255,7 @@ public class InformationStorage {
         Log.d("DB_ADD", "Event ADDED");
         if (events.add(event)){
             ContentValues values = new ContentValues();
+            values.put(EventDB.EventEntries.NAME, event.getName());
             values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
             values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
             values.put(EventDB.EventEntries.USER_ID, event.getU_id());
@@ -285,6 +288,7 @@ public class InformationStorage {
     public boolean addLocation(LocationHolder location){
         if (locations.add(location)){
             ContentValues values = new ContentValues();
+            values.put(LocationDB.LocationEntries.NAME, location.getName());
             values.put(LocationDB.LocationEntries.ADDRESS, location.getL_address());
             values.put(LocationDB.LocationEntries.LATITUDE, location.getLatitude());
             values.put(LocationDB.LocationEntries.LONGITUDE, location.getLongitude());
@@ -299,6 +303,7 @@ public class InformationStorage {
 
     private ContentValues getEventValues(EventHolder event){
         ContentValues values = new ContentValues();
+        values.put(EventDB.EventEntries.NAME, event.getName());
         values.put(EventDB.EventEntries.LOCATION_ID, event.getL_id());
         values.put(EventDB.EventEntries.SPORT_ID, event.getS_id());
         values.put(EventDB.EventEntries.USER_ID, event.getU_id());
@@ -309,6 +314,7 @@ public class InformationStorage {
     }
     private ContentValues getLocationValues(LocationHolder location){
         ContentValues values = new ContentValues();
+        values.put(LocationDB.LocationEntries.NAME, location.getName());
         values.put(LocationDB.LocationEntries.ADDRESS, location.getL_address());
         values.put(LocationDB.LocationEntries.LATITUDE, location.getLatitude());
         values.put(LocationDB.LocationEntries.LONGITUDE, location.getLongitude());
@@ -423,7 +429,8 @@ public class InformationStorage {
         EventHolder eventHolder = null;
         for (Iterator<String> id_keys = object.keys(); id_keys.hasNext(); ) {
             String key = id_keys.next();
-            if (key.equals("user_id"))      eventHolder = new EventHolder(id, object.getString(key));
+            if (key.equals("name"))      eventHolder = new EventHolder(id, object.getString(key));
+            if (key.equals("user_id"))      eventHolder.setU_id(object.getInt(key));
             if (key.equals("time"))         eventHolder.setTime(object.getString(key));
             if (key.equals("date"))         eventHolder.setDate(object.getString(key));
             if (key.equals("description"))  eventHolder.setDescription(object.getString(key));
