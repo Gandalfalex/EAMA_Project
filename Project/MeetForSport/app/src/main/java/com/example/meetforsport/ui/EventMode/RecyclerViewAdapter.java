@@ -33,7 +33,8 @@ import com.example.meetforsport.ui.EventCreator.DataHolder.SportHolder;
 import com.example.meetforsport.ui.EventInformation.EventInformationActivity;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.SViewHolder> {
 
@@ -42,6 +43,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private  InformationStorage storage;
     private final Context context;
     private final Activity activity;
+
 
     public RecyclerViewAdapter(Context context, Activity activity){
         storage =  InformationStorage.getInstance(context);
@@ -67,8 +69,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.event_sport.setText(sport.getName());
         holder.event_time.setText(information.get(position).getTime());
         holder.event_date.setText(information.get(position).getDate());
-
-        holder.event_participants.setText(sport.getName());
+        int randomNum = ThreadLocalRandom.current().nextInt(1, sport.getMaxPlayer());
+        holder.event_participants.setText(randomNum);
         holder.event_creator.setText("by " + information.get(position).getU_id());
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(activity, EventInformationActivity.class);
