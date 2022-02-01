@@ -103,7 +103,7 @@ public class InformationStorage {
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("events"));
             eventUpdate = LocalDateTime.now();
         }
-        else{
+        else if (events.isEmpty()){
             Log.d("DB_LOAD_Event","Load from EventDB");
             pullFromEventDB();
             Log.d("DB_LOAD_Event", "found " + String.valueOf(events.size() + " elements"));
@@ -118,7 +118,7 @@ public class InformationStorage {
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("maps"));
             locationUpdate = LocalDateTime.now();
         }
-        else{
+        else if (locations.isEmpty()){
             Log.d("DB_LOAD_Location","Load from LocationsDB");
             pullFormLocationDB();
             Log.d("DB_LOAD_Location", "found " + String.valueOf(locations.size() + " elements"));
@@ -133,7 +133,7 @@ public class InformationStorage {
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("sports"));
             sportsUpdate = LocalDateTime.now();
         }
-        else {
+        else if (sports.isEmpty()){
             Log.d("DB_LOAD_Sport","Load from SportDB");
             pullFromSportDB();
             Log.d("DB_LOAD_Sport", "found " + String.valueOf(sports.size() + " elements"));
@@ -149,7 +149,7 @@ public class InformationStorage {
      */
     public SportHolder getSport(int position){
         if (position >= sports.size()){
-            return sports.get(0);
+            return null;
         }
         return sports.get(position);
     }
@@ -161,14 +161,14 @@ public class InformationStorage {
      */
     public EventHolder getEvent(int position){
         if (position >= events.size()){
-            return events.get(0);
+            return null;
         }
         return events.get(position);
     }
 
     public LocationHolder getLocation(int position){
         if (position >= locations.size()){
-            return locations.get(0);
+            return null;
         }
         return locations.get(position);
     }

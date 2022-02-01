@@ -85,6 +85,7 @@ public class MapFragment extends Fragment implements
     private LocationCallback locationCallback;
     private OnLocationChangedListener mMapLocationListener = null;
     private BroadcastReceiver batteryBroadcastReceiver;
+    private Location lastLocation = null;
 
     private TextView noPermissionTV;
     private Button sportSelectionBtn;
@@ -217,11 +218,14 @@ public class MapFragment extends Fragment implements
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 for (Location location : locationResult.getLocations()) {
                     if (location != null) {
+                        Log.e("Location Update",location.toString());
                         if (mMapLocationListener != null) {
                             mMapLocationListener.onLocationChanged(location);
                         }
-                        Log.e("Location Update",location.toString());
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                        if (lastLocation == null || lastLocation.distanceTo(location) > 1000) {
+                            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12.0f));
+                        }
+                        lastLocation = location;
                     }
                 }
             }

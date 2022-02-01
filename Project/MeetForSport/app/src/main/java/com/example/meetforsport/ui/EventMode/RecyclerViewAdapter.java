@@ -70,7 +70,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.event_time.setText(information.get(position).getTime());
         holder.event_date.setText(information.get(position).getDate());
         int randomNum = ThreadLocalRandom.current().nextInt(1, sport.getMaxPlayer());
-        holder.event_participants.setText(randomNum);
+        holder.event_participants.setText(String.valueOf(randomNum));
         holder.event_creator.setText("by " + information.get(position).getU_id());
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(activity, EventInformationActivity.class);
