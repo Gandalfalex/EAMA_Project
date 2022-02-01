@@ -22,6 +22,7 @@
 
         <activity
             android:name=".ui.EventCreator.EventCreator"
+            android:label="@string/new_Event_planner_headline"
             android:exported="false" />
         <activity
             android:name=".ui.EventInformation.EventInformationActivity"
