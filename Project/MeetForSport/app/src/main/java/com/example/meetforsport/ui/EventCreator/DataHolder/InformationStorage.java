@@ -44,6 +44,8 @@ public class InformationStorage {
     private SportDB sportDB;
     private LocationDB locationDB;
 
+    public boolean hasConnection = true;
+
 
     String[] projectionEvent = {
             BaseColumns._ID,
@@ -79,6 +81,7 @@ public class InformationStorage {
         getEvents(context);
         getSports(context);
         getLocations(context);
+
     }
 
     public static synchronized InformationStorage getInstance(Context context) {
@@ -89,6 +92,9 @@ public class InformationStorage {
     }
 
 
+    public void getConnection(){
+
+    }
     /***
      * first case: first initialization, see if server is reachable, pull data accordingly
      * second case: its time to update data
@@ -97,17 +103,13 @@ public class InformationStorage {
      * @return
      */
     public ArrayList<EventHolder> getEvents(Context context) {
-        if (events.isEmpty() && BatteryOptions.checkForUpdateConditions(eventUpdate, context)) {
+        if (BatteryOptions.checkForUpdateConditions(eventUpdate, context)) {
             Log.d("DB_LOAD","Load while Conditions allow to");
             events = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("events"));
             eventUpdate = LocalDateTime.now();
         }
-        else if (events.isEmpty()){
-            Log.d("DB_LOAD_Event","Load from EventDB");
-            pullFromEventDB();
-            Log.d("DB_LOAD_Event", "found " + String.valueOf(events.size() + " elements"));
-        }
+
         return events;
     }
 
@@ -118,7 +120,7 @@ public class InformationStorage {
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("maps"));
             locationUpdate = LocalDateTime.now();
         }
-        else if (locations.isEmpty()){
+        else{
             Log.d("DB_LOAD_Location","Load from LocationsDB");
             pullFormLocationDB();
             Log.d("DB_LOAD_Location", "found " + String.valueOf(locations.size() + " elements"));
@@ -127,13 +129,16 @@ public class InformationStorage {
         return locations;
     }
 
+
+
+
     public ArrayList<SportHolder> getSports(Context context) {
         if (sports.isEmpty() && BatteryOptions.checkForUpdateConditions(sportsUpdate, context)) {
             sports = new ArrayList<>();
             GetRequestCreator.getInstance(context).addToRequestQueue(createJsonRequest("sports"));
             sportsUpdate = LocalDateTime.now();
         }
-        else if (sports.isEmpty()){
+        else {
             Log.d("DB_LOAD_Sport","Load from SportDB");
             pullFromSportDB();
             Log.d("DB_LOAD_Sport", "found " + String.valueOf(sports.size() + " elements"));
@@ -196,7 +201,6 @@ public class InformationStorage {
             event.setS_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.SPORT_ID)));
             event.setL_id(cursor.getInt(cursor.getColumnIndexOrThrow(EventDB.EventEntries.LOCATION_ID)));
             event.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(EventDB.EventEntries.DESCRIPTION_COLUMN)));
-            Log.d("DB_LOAD_E", event.getName() +  "  " + event.getTime());
             events.add(event);
         }
         eventDB.close();
@@ -338,6 +342,7 @@ public class InformationStorage {
                             String id_key = id.next();
                             try {
                                 if (site.equals("events")){
+                                    Log.d("DB_LOAD_Sync", "get new Data from Server");
                                     JSONArray event_object = response.getJSONArray(id_key);
                                     for (int i = 0; i < event_object.length(); i++){
                                         JSONObject event = event_object.getJSONObject(i);
@@ -366,6 +371,9 @@ public class InformationStorage {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        pullFromSportDB();
+                        pullFormLocationDB();
+                        pullFromEventDB();
                         Log.d("Error_No_Connection", error.toString());
                     }
                 });
@@ -378,10 +386,11 @@ public class InformationStorage {
         Log.d("DB_LOAD_sync","Stored elements in db");
         switch (s){
             case "events":  {
-                eventDB.onUpgrade(eventDB.getWritableDatabase(),0,0);
-                eventDB.close();
+                Log.d("DB_LOAD_sync","deleted old files " + eventDB.getReadableDatabase().getPageSize());
                 SQLiteDatabase db = eventDB.getWritableDatabase();
-                for (EventHolder event: events) db.insert(EventDB.EventEntries.TABLE_NAME, null, getEventValues(event));
+                eventDB.onUpgrade(db,0,0);
+                if (!eventDB.getReadableDatabase().inTransaction())
+                    for (EventHolder event: events) db.insert(EventDB.EventEntries.TABLE_NAME, null, getEventValues(event));
                 eventDB.close();
                 Log.d("DB_LOAD_Events","Stored " + events.size() + " elements in db");
             }
